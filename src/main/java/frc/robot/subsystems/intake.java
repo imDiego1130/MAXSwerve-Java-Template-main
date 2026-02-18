@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 
@@ -50,6 +51,7 @@ public class Intake extends SubsystemBase {
 
         pivotPID = pivotMotor.getClosedLoopController();
         pivotEncoder = pivotMotor.getEncoder();
+        raise();
     }
 
     // =========================
@@ -57,13 +59,13 @@ public class Intake extends SubsystemBase {
     // =========================
 
     public void intakeIn() {
-        groundRoller.set(0.75);
-        topRoller.set(1.0);
+        groundRoller.set(0.8);
+        topRoller.set(0.8);
     }
 
     public void intakeOut() {
-        groundRoller.set(-1.0);
-        topRoller.set(-1.0);
+        groundRoller.set(-0.8);
+        topRoller.set(-0.8);
     }
 
     public void stopRollers() {
@@ -93,4 +95,10 @@ public class Intake extends SubsystemBase {
         stopRollers();
         pivotMotor.stopMotor();
     }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Pivot Position", pivotEncoder.getPosition());
+    }
+
 }

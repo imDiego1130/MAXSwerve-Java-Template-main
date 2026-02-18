@@ -142,5 +142,9 @@ public class RobotContainer {
         return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
     }
 
+    public Intake getIntake() {
+        return m_intake;
+    }
+
 
 }
