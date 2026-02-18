@@ -20,12 +20,12 @@ public final class Configs {
       // NEO integrated encoder reports motor rotations.
       // If you want "radians at the wheel/module", you should divide by the steering reduction here.
       // For now, this matches your existing intent (radians per motor rotation).
-      double turningFactor = 2.0 * Math.PI;
+    double turningFactor = (2.0 * Math.PI) / 12.8;
 
       double nominalVoltage = 12.0;
 
       // Your constant name says Rps, but your math produces meters/sec.
-      // This keeps your behavior unchanged.
+      // This keeps your behavior unchanged.  
       double drivingVelocityFeedForward = nominalVoltage / ModuleConstants.kDriveWheelFreeSpeedRps;
 
       // -------------------- DRIVING --------------------
@@ -57,13 +57,39 @@ public final class Configs {
           .velocityConversionFactor(turningFactor / 60.0); // radians per second
 
       turningConfig.closedLoop
-          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
           // Example gains — tune for your robot
-          .pid(1.0, 0.0, 0.0)
+          .pid(2.60, 0.0, 0.0)
           .outputRange(-1.0, 1.0)
           // Wrap 0..2pi so angle setpoints behave nicely
           .positionWrappingEnabled(true)
           .positionWrappingInputRange(0.0, turningFactor);
     }
   }
+  public static final class Intake {
+
+    public static final SparkMaxConfig rollerConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
+
+    static {
+        // Rollers (open loop)
+        rollerConfig
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(40);
+
+        // Pivot (closed loop position)
+        pivotConfig
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(30);
+
+        pivotConfig.encoder
+            .positionConversionFactor(1.0);
+
+        pivotConfig.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pid(0.05, 0.0, 0.0)
+            .outputRange(-1.0, 1.0);
+    }
+}
+
 }

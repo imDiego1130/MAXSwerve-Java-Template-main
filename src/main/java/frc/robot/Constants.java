@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -40,26 +39,26 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double kFrontLeftChassisAngularOffset = Math.toRadians(0);
+    public static final double kFrontLeftChassisAngularOffset = Math.toRadians(45);
     public static final double kFrontRightChassisAngularOffset = Math.toRadians(0);
-    public static final double kBackLeftChassisAngularOffset = Math.toRadians(0);
-    public static final double kBackRightChassisAngularOffset = Math.toRadians(0);
+    public static final double kBackLeftChassisAngularOffset = Math.toRadians(90);
+    public static final double kBackRightChassisAngularOffset = Math.toRadians(90);
 
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 6;
     public static final int kRearLeftDrivingCanId = 7;
     public static final int kFrontRightDrivingCanId = 1;
     public static final int kRearRightDrivingCanId = 4;
-
+  
     public static final int kFrontLeftTurningCanId = 5;
     public static final int kRearLeftTurningCanId = 8;
     public static final int kFrontRightTurningCanId = 2;
     public static final int kRearRightTurningCanId = 3;
     // Inside DriveConstants
-    public static final int kFrontLeftTurningCanCoderId = 9;
-    public static final int kFrontRightTurningCanCoderId = 10;
-    public static final int kRearLeftTurningCanCoderId = 11;
-    public static final int kRearRightTurningCanCoderId = 12;
+    public static final int kFrontLeftTurningCanCoderId = 10;
+    public static final int kFrontRightTurningCanCoderId = 12;
+    public static final int kRearLeftTurningCanCoderId = 9;
+    public static final int kRearRightTurningCanCoderId = 11;
 
     public static final boolean kGyroReversed = true;
   }
@@ -83,7 +82,8 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final double kDriveDeadband = 0.05;
+    public static final int kOperatorControllerPort = 1;
+    public static final double kDriveDeadband = 0.06;
   }
 
   public static final class AutoConstants {

@@ -115,9 +115,14 @@ public class MAXSwerveModule {
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
   }
-  private Rotation2d getTurningRotation() {
+  /*private Rotation2d getTurningRotation() {
     // CANcoder returns degrees, WPILib wants radians
     return Rotation2d.fromDegrees(
+        m_turningEncoder.getAbsolutePosition().getValueAsDouble()
+    );
+}*/
+private Rotation2d getTurningRotation() {
+    return Rotation2d.fromRotations( // fromRotations not degrees
         m_turningEncoder.getAbsolutePosition().getValueAsDouble()
     );
 }
