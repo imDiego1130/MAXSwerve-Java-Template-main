@@ -14,7 +14,7 @@ public class Intake extends SubsystemBase {
     // Motors
     private final SparkMax groundRoller;
     private final SparkMax pivotMotor;
-    private final SparkMax topRoller;
+   // private final SparkMax topRoller;
 
     // Encoder + PID (ONLY for pivot)
     private final RelativeEncoder pivotEncoder;
@@ -29,7 +29,7 @@ public class Intake extends SubsystemBase {
 
         groundRoller = new SparkMax(13, MotorType.kBrushless);
         pivotMotor   = new SparkMax(14, MotorType.kBrushless);
-        topRoller    = new SparkMax(15, MotorType.kBrushless);
+        //topRoller    = new SparkMax(15, MotorType.kBrushless);
 
         groundRoller.configure(
             Configs.Intake.rollerConfig,
@@ -37,11 +37,11 @@ public class Intake extends SubsystemBase {
             SparkMax.PersistMode.kPersistParameters
         );
 
-        topRoller.configure(
+        /*topRoller.configure(
             Configs.Intake.rollerConfig,
             SparkMax.ResetMode.kResetSafeParameters,
             SparkMax.PersistMode.kPersistParameters
-        );
+        );*/
 
         pivotMotor.configure(
             Configs.Intake.pivotConfig,
@@ -60,17 +60,17 @@ public class Intake extends SubsystemBase {
 
     public void intakeIn() {
         groundRoller.set(0.8);
-        topRoller.set(0.8);
+        //topRoller.set(0.8);
     }
 
     public void intakeOut() {
         groundRoller.set(-0.8);
-        topRoller.set(-0.8);
+        //topRoller.set(-0.8);
     }
 
     public void stopRollers() {
         groundRoller.set(0);
-        topRoller.set(0);
+        //topRoller.set(0);
     }
 
     // =========================

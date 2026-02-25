@@ -55,10 +55,10 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 2;
     public static final int kRearRightTurningCanId = 3;
     // Inside DriveConstants
-    public static final int kFrontLeftTurningCanCoderId = 10;
+    public static final int kFrontLeftTurningCanCoderId = 9;
     public static final int kFrontRightTurningCanCoderId = 12;
-    public static final int kRearLeftTurningCanCoderId = 9;
-    public static final int kRearRightTurningCanCoderId = 11;
+    public static final int kRearLeftTurningCanCoderId = 11;
+    public static final int kRearRightTurningCanCoderId = 10;
 
     public static final boolean kGyroReversed = true;
   }

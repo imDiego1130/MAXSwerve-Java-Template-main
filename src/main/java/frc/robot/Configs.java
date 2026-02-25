@@ -57,7 +57,7 @@ public final class Configs {
           .velocityConversionFactor(turningFactor / 60.0); // radians per second
 
       turningConfig.closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Example gains — tune for your robot
           .pid(2.60, 0.0, 0.0)
           .outputRange(-1.0, 1.0)

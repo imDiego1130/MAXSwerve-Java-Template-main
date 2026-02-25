@@ -7,6 +7,10 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Revolution;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -14,6 +18,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 
@@ -24,8 +29,8 @@ public class MAXSwerveModule {
   private final SparkMax m_turningSpark;
 
   private final RelativeEncoder m_drivingEncoder;
-  //private final AbsoluteEncoder m_turningEncoder;
-  private final CANcoder m_turningEncoder;
+  private final RelativeEncoder m_turningEncoder;
+  //private final CANcoder m_turningEncoder;
 
   private final SparkClosedLoopController m_drivingClosedLoopController;
   private final SparkClosedLoopController m_turningClosedLoopController;
@@ -44,8 +49,8 @@ public class MAXSwerveModule {
     m_turningSpark = new SparkMax(turningCANId, MotorType.kBrushless);
 
     m_drivingEncoder = m_drivingSpark.getEncoder();
-    //m_turningEncoder = m_turningSpark.getAbsoluteEncoder();
-    m_turningEncoder = new CANcoder(canCoderId);
+    m_turningEncoder = m_turningSpark.getEncoder();
+    //m_turningEncoder = new CANcoder(canCoderId);
 
     m_drivingClosedLoopController = m_drivingSpark.getClosedLoopController();
     m_turningClosedLoopController = m_turningSpark.getClosedLoopController();
@@ -59,8 +64,8 @@ public class MAXSwerveModule {
         PersistMode.kPersistParameters);
 
     m_chassisAngularOffset = chassisAngularOffset;
-    //m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
-    m_desiredState.angle = getTurningRotation();
+    m_desiredState.angle = Rotation2d.fromRotations(m_turningEncoder.getPosition());
+    //m_desiredState.angle = getTurningRotation();
     m_drivingEncoder.setPosition(0);
   }
 
@@ -73,7 +78,7 @@ public class MAXSwerveModule {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModuleState(m_drivingEncoder.getVelocity(),
-        getTurningRotation().minus(Rotation2d.fromRadians(m_chassisAngularOffset)));
+        Rotation2d.fromRotations(m_turningEncoder.getPosition() - m_chassisAngularOffset));//.minus(Rotation2d.fromRadians(m_chassisAngularOffset)));
   }
 
   /**
@@ -86,7 +91,7 @@ public class MAXSwerveModule {
     // relative to the chassis.
     return new SwerveModulePosition(
         m_drivingEncoder.getPosition(),
-        getTurningRotation().minus(Rotation2d.fromRadians(m_chassisAngularOffset)));
+        Rotation2d.fromRotations(m_turningEncoder.getPosition() - m_chassisAngularOffset));//.minus(Rotation2d.fromRadians(m_chassisAngularOffset)));
   }
 
   /**
@@ -101,8 +106,8 @@ public class MAXSwerveModule {
     correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
-    //correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
-    correctedDesiredState.optimize(getTurningRotation());
+    correctedDesiredState.optimize(Rotation2d.fromRotations(m_turningEncoder.getPosition()));
+    //correctedDesiredState.optimize(getTurningRotation());
 
     // Command driving and turning SPARKS towards their respective setpoints.
     m_drivingClosedLoopController.setSetpoint(correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity);
@@ -121,10 +126,13 @@ public class MAXSwerveModule {
         m_turningEncoder.getAbsolutePosition().getValueAsDouble()
     );
 }*/
+
+/* 
 private Rotation2d getTurningRotation() {
     return Rotation2d.fromRotations( // fromRotations not degrees
-        m_turningEncoder.getAbsolutePosition().getValueAsDouble()
+        m_turningEncoder.getAbsolutePosition().getValue().in(Revolution)
     );
 }
+    */
 
 }
