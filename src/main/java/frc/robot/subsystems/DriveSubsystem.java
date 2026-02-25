@@ -9,13 +9,15 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
-import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+import com.studica.frc.AHRS;
+import com.studica.frc.AHRS.NavXComType;
+
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -24,30 +26,36 @@ public class DriveSubsystem extends SubsystemBase {
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
+      DriveConstants.kFrontLeftTurningCanCoderId,
       DriveConstants.kFrontLeftChassisAngularOffset);
 
   private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
+      DriveConstants.kFrontRightTurningCanCoderId,
       DriveConstants.kFrontRightChassisAngularOffset);
 
   private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
+      DriveConstants.kRearLeftTurningCanCoderId,
       DriveConstants.kBackLeftChassisAngularOffset);
 
   private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
+      DriveConstants.kRearRightTurningCanCoderId,
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+  //private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+  private final AHRS m_gyro = new AHRS(NavXComType.kUSB2);
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
+      Rotation2d.fromDegrees(m_gyro.getYaw()
+),
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
@@ -65,7 +73,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
     m_odometry.update(
-        Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
+        Rotation2d.fromDegrees(m_gyro.getYaw()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -90,7 +98,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose) {
     m_odometry.resetPosition(
-        Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
+        Rotation2d.fromDegrees(m_gyro.getYaw()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -110,7 +118,7 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    // Convert the commanded speeds into the correct units for the drivetrain
+    // Convert the commanded speeds `o the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
@@ -118,7 +126,7 @@ public class DriveSubsystem extends SubsystemBase {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)))
+                Rotation2d.fromDegrees(m_gyro.getYaw()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -171,7 +179,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)).getDegrees();
+  return m_gyro.getYaw();
   }
 
   /**
@@ -180,6 +188,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate(IMUAxis.kZ) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 }
