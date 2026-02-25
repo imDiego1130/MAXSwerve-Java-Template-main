@@ -59,11 +59,11 @@ public final class Configs {
       turningConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Example gains — tune for your robot
-          .pid(2.60, 0.0, 0.0)
+          .pid(1.0, 0.0, 0.0)
           .outputRange(-1.0, 1.0)
           // Wrap 0..2pi so angle setpoints behave nicely
           .positionWrappingEnabled(true)
-          .positionWrappingInputRange(0.0, turningFactor);
+          .positionWrappingInputRange(0.0, 2.0 * Math.PI);
     }
   }
   public static final class Intake {
