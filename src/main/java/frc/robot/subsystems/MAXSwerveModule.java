@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -40,13 +41,20 @@ public class MAXSwerveModule {
    * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
    * Encoder.
    */
-  public MAXSwerveModule(int drivingCANId, int turningCANId, int canCoderId, double chassisAngularOffset) {
+  public MAXSwerveModule(int drivingCANId, int turningCANId, int canCoderId, double chassisAngularOffset, boolean invertMotor) {
     m_drivingSpark = new SparkMax(drivingCANId, MotorType.kBrushless);
     m_turningSpark = new SparkMax(turningCANId, MotorType.kBrushless);
 
+    // invert driving motor direction if necessary
+    SparkMaxConfig drivingConfig = Configs.MAXSwerveModule.drivingConfig;
+    if (invertMotor) {
+      drivingConfig.inverted(true);
+    }
 
     m_drivingEncoder = m_drivingSpark.getEncoder();
+    // Internal Encoder wants & gives positions in RADIANS
     m_turningEncoder = m_turningSpark.getEncoder();
+    // CANcoder wants & gives positions in ROTATIONS
     m_turningCAN = new CANcoder(canCoderId);
 
     m_drivingClosedLoopController = m_drivingSpark.getClosedLoopController();
@@ -55,7 +63,7 @@ public class MAXSwerveModule {
     // Apply the respective configurations to the SPARKS. Reset parameters before
     // applying the configuration to bring the SPARK to a known good state. Persist
     // the settings to the SPARK to avoid losing them on a power cycle.
-    m_drivingSpark.configure(Configs.MAXSwerveModule.drivingConfig, ResetMode.kResetSafeParameters,
+    m_drivingSpark.configure(drivingConfig, ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters);
     m_turningSpark.configure(Configs.MAXSwerveModule.turningConfig, ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters);

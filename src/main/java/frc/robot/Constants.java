@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -40,6 +39,8 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
+    // THESE VALUES SHOULD BE THE CANcoder's ABSOLUTE ANGLE WHEN STRAIGHT
+    // if they are zeroed, these values are unnecessary and can be set to 0
     public static final double kFrontLeftChassisAngularOffset = Math.toRadians(0);
     public static final double kFrontRightChassisAngularOffset = Math.toRadians(0);
     public static final double kBackLeftChassisAngularOffset = Math.toRadians(0);
@@ -60,6 +61,11 @@ public final class Constants {
     public static final int kFrontRightTurningCanCoderId = 12;
     public static final int kRearLeftTurningCanCoderId = 11;
     public static final int kRearRightTurningCanCoderId = 10;
+    // DRIVING Motor direction (inverted or not)
+    public static final boolean kFrontLeftDrivingInvertDirection = true;
+    public static final boolean kFrontRightDrivingInvertDirection = false;
+    public static final boolean kRearLeftDrivingInvertDirection = false;
+    public static final boolean kRearRightDrivingInvertDirection = true;
 
     public static final boolean kGyroReversed = true;
   }

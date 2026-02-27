@@ -49,7 +49,7 @@ public final class Configs {
       // -------------------- TURNING --------------------
       turningConfig
           .idleMode(IdleMode.kBrake)
-          .smartCurrentLimit(50);
+          .smartCurrentLimit(20);
 
       // Use the motor’s integrated encoder (primary encoder) for turning closed-loop
       turningConfig.encoder
@@ -59,7 +59,7 @@ public final class Configs {
       turningConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Example gains — tune for your robot
-          .pid(0.25, 0.0, 1.5)
+          .pid(1.0, 0.0, 1.5)
           .outputRange(-1.0, 1.0)
           // Wrap 0..2pi so angle setpoints behave nicely
           .positionWrappingEnabled(true)

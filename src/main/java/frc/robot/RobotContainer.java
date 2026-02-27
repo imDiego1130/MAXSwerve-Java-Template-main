@@ -14,19 +14,18 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.List;
-import frc.robot.subsystems.Intake;
+
+import frc.robot.subsystems.Intake.IntakePivot;
+import frc.robot.subsystems.Intake.IntakeRollers;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -37,7 +36,8 @@ import frc.robot.subsystems.Intake;
 public class RobotContainer {
     // The robot's subsystems
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    private final Intake m_intake = new Intake();
+    private final IntakeRollers m_intakeRollers = new IntakeRollers();
+    private final IntakePivot m_intakePivot = new IntakePivot();
 
     // The driver's controller
     XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -84,28 +84,27 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                         () -> m_robotDrive.zeroHeading(),
                         m_robotDrive));
-                        
+
+        // Triggers
         Trigger rightTrigger = new Trigger(() -> m_driverController.getRightTriggerAxis() > 0.2);
         rightTrigger.whileTrue(
-                new RunCommand(() -> m_intake.intakeIn(), m_intake)
+                new RunCommand(() -> m_intakeRollers.intakeIn(), m_intakeRollers)
         );
 
         Trigger leftTrigger = new Trigger(() -> m_driverController.getLeftTriggerAxis() > 0.2);
         leftTrigger.whileTrue(
-                new RunCommand(() -> m_intake.intakeOut(), m_intake)
+                new RunCommand(() -> m_intakeRollers.intakeOut(), m_intakeRollers)
         );
 
-        rightTrigger.or(leftTrigger).whileFalse(
-                new RunCommand(() -> m_intake.stopRollers(), m_intake)
+        // Bumpers
+        Trigger leftBumper = new Trigger(() -> m_driverController.getLeftBumperButton());
+        leftBumper.toggleOnTrue(
+                new RunCommand(() -> m_intakePivot.lower(), m_intakePivot)
         );
-
-        //Button kLeftBumper = new Trigger(() -> m_driverController.getLeftBumperButton());
-
-        new JoystickButton(m_operatorController, XboxController.Button.kLeftBumper.value)
-                .onTrue(new RunCommand(() -> m_intake.raise(), m_intake));
-
-        new JoystickButton(m_operatorController, XboxController.Button.kRightBumper.value)
-                .onTrue(new RunCommand(() -> m_intake.lower(), m_intake));
+        Trigger rightBumper = new Trigger(() -> m_driverController.getRightBumperButton());
+        rightBumper.toggleOnTrue(
+                new RunCommand(() -> m_intakePivot.raise(), m_intakePivot)
+        );
     }
 
     /**
@@ -154,8 +153,8 @@ public class RobotContainer {
         return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
     }
 
-    public Intake getIntake() {
-        return m_intake;
+    public IntakeRollers getIntake() {
+        return m_intakeRollers;
     }
 
 
