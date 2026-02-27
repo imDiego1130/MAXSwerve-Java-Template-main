@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -39,10 +40,10 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double kFrontLeftChassisAngularOffset = Math.toRadians(45);
+    public static final double kFrontLeftChassisAngularOffset = Math.toRadians(0);
     public static final double kFrontRightChassisAngularOffset = Math.toRadians(0);
-    public static final double kBackLeftChassisAngularOffset = Math.toRadians(90);
-    public static final double kBackRightChassisAngularOffset = Math.toRadians(90);
+    public static final double kBackLeftChassisAngularOffset = Math.toRadians(0);
+    public static final double kBackRightChassisAngularOffset = Math.toRadians(0);
 
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 6;
@@ -83,7 +84,7 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
-    public static final double kDriveDeadband = 0.06;
+    public static final double kDriveDeadband = 0.1;
   }
 
   public static final class AutoConstants {

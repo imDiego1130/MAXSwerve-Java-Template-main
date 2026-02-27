@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import java.util.List;
 import frc.robot.subsystems.Intake;
 
@@ -56,8 +58,8 @@ public class RobotContainer {
                 new RunCommand(
                         () -> m_robotDrive.drive(
                                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                                MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                                MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                                 true),
                         m_robotDrive));
     }
@@ -72,7 +74,7 @@ public class RobotContainer {
      * {@link JoystickButton}.
      */
     private void configureButtonBindings() {
-        /* 
+        
         new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
                 .whileTrue(new RunCommand(
                         () -> m_robotDrive.setX(),
@@ -82,13 +84,22 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(
                         () -> m_robotDrive.zeroHeading(),
                         m_robotDrive));
-                        */
+                        
+        Trigger rightTrigger = new Trigger(() -> m_driverController.getRightTriggerAxis() > 0.2);
+        rightTrigger.whileTrue(
+                new RunCommand(() -> m_intake.intakeIn(), m_intake)
+        );
 
-        new JoystickButton(m_driverController, XboxController.Axis.kRightTrigger.value)
-                .whileTrue(new RunCommand(() -> m_intake.intakeIn(), m_intake));
+        Trigger leftTrigger = new Trigger(() -> m_driverController.getLeftTriggerAxis() > 0.2);
+        leftTrigger.whileTrue(
+                new RunCommand(() -> m_intake.intakeOut(), m_intake)
+        );
 
-        new JoystickButton(m_driverController, XboxController.Axis.kLeftTrigger.value)
-                .whileTrue(new RunCommand(() -> m_intake.intakeOut(), m_intake));
+        rightTrigger.or(leftTrigger).whileFalse(
+                new RunCommand(() -> m_intake.stopRollers(), m_intake)
+        );
+
+        //Button kLeftBumper = new Trigger(() -> m_driverController.getLeftBumperButton());
 
         new JoystickButton(m_operatorController, XboxController.Button.kLeftBumper.value)
                 .onTrue(new RunCommand(() -> m_intake.raise(), m_intake));

@@ -61,7 +61,7 @@ public class MAXSwerveModule {
             PersistMode.kPersistParameters);
 
     // zero the relative encoder using the CANcoder AFTER configuring
-    m_turningEncoder.setPosition(m_turningCAN.getAbsolutePosition().getValueAsDouble());
+    m_turningEncoder.setPosition(m_turningCAN.getAbsolutePosition().getValue().in(Radians));
 
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = Rotation2d.fromRotations(m_turningEncoder.getPosition());
