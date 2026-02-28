@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,8 +22,9 @@ public class IntakePivot extends SubsystemBase {
     private final SparkClosedLoopController pivotPID;
 
     // Preset Positions (example values — you must tune)
-    private static final double UP_POSITION = 0.0;
-    private static final double DOWN_POSITION = 25.0;
+    // deg
+    private static final double UP_POSITION = 0.380952;
+    private static final double DOWN_POSITION = 0.380952*4;
 
     @SuppressWarnings("removal")
     public IntakePivot() {
@@ -36,6 +38,7 @@ public class IntakePivot extends SubsystemBase {
 
         pivotPID = pivotMotor.getClosedLoopController();
         pivotEncoder = pivotMotor.getEncoder();
+        pivotEncoder.setPosition(0);
 
         setDefaultCommand(
                 new RunCommand(() -> stop(), this)
@@ -67,6 +70,7 @@ public class IntakePivot extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Pivot Position", pivotEncoder.getPosition());
+        SmartDashboard.putNumber("Pivot Target: ", pivotPID.getSetpoint());
     }
 
 }

@@ -62,8 +62,8 @@ public final class Constants {
     public static final int kRearLeftTurningCanCoderId = 11;
     public static final int kRearRightTurningCanCoderId = 10;
     // DRIVING Motor direction (inverted or not)
-    public static final boolean kFrontLeftDrivingInvertDirection = true;
-    public static final boolean kFrontRightDrivingInvertDirection = false;
+    public static final boolean kFrontLeftDrivingInvertDirection = false;
+    public static final boolean kFrontRightDrivingInvertDirection = true;
     public static final boolean kRearLeftDrivingInvertDirection = false;
     public static final boolean kRearRightDrivingInvertDirection = true;
 

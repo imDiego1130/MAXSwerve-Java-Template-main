@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
@@ -87,9 +88,21 @@ public final class Configs {
 
         pivotConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(0.05, 0.0, 0.0)
+            .pid(2.0, 0.0, 0.0)
             .outputRange(-1.0, 1.0);
     }
-}
+  }
+  public static final class Spindexer {
+    public static final SparkMaxConfig spindexerConfig = new SparkMaxConfig();
+
+    static {
+        // spindexer (open loop : for now)
+        spindexerConfig
+            .idleMode(IdleMode.kCoast)
+            .smartCurrentLimit(50);
+
+        
+    }
+  }
 
 }

@@ -19,6 +19,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Spindexer;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -38,6 +39,7 @@ public class RobotContainer {
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
     private final IntakeRollers m_intakeRollers = new IntakeRollers();
     private final IntakePivot m_intakePivot = new IntakePivot();
+    private final Spindexer m_spindexer = new Spindexer();
 
     // The driver's controller
     XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -58,8 +60,8 @@ public class RobotContainer {
                 new RunCommand(
                         () -> m_robotDrive.drive(
                                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                                MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                                MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                                 true),
                         m_robotDrive));
     }
@@ -75,7 +77,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         
-        new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+        new JoystickButton(m_driverController, XboxController.Button.kX.value)
                 .whileTrue(new RunCommand(
                         () -> m_robotDrive.setX(),
                         m_robotDrive));
@@ -104,6 +106,17 @@ public class RobotContainer {
         Trigger rightBumper = new Trigger(() -> m_driverController.getRightBumperButton());
         rightBumper.toggleOnTrue(
                 new RunCommand(() -> m_intakePivot.raise(), m_intakePivot)
+        );
+
+        // Spindexer
+        Trigger buttonA = new Trigger(() -> m_operatorController.getLeftTriggerAxis() > 0.03);
+        buttonA.whileTrue(
+                new RunCommand(() -> m_spindexer.spinClockwise(m_operatorController.getLeftTriggerAxis() ), m_spindexer)
+        );
+
+        Trigger buttonY = new Trigger(() -> m_operatorController.getRightTriggerAxis() > 0.03);
+        buttonY.whileTrue(
+                new RunCommand(() -> m_spindexer.spinCounterClockwise(m_operatorController.getRightTriggerAxis()), m_spindexer)
         );
     }
 
@@ -157,5 +170,8 @@ public class RobotContainer {
         return m_intakeRollers;
     }
 
+    public Spindexer getSpindexer() {
+        return m_spindexer;
+    }
 
 }

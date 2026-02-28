@@ -49,6 +49,8 @@ public class MAXSwerveModule {
     SparkMaxConfig drivingConfig = Configs.MAXSwerveModule.drivingConfig;
     if (invertMotor) {
       drivingConfig.inverted(true);
+    } else {
+      drivingConfig.inverted(false);
     }
 
     m_drivingEncoder = m_drivingSpark.getEncoder();
