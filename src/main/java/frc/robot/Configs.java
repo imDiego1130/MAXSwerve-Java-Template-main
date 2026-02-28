@@ -2,10 +2,11 @@ package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.FeedbackSensor;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TurretConstants;
 
 public final class Configs {
   public static final class MAXSwerveModule {
@@ -21,13 +22,13 @@ public final class Configs {
       // NEO integrated encoder reports motor rotations.
       // If you want "radians at the wheel/module", you should divide by the steering reduction here.
       // For now, this matches your existing intent (radians per motor rotation).
-    double turningFactor = (2.0 * Math.PI) / 12.8;
+      double turningFactor = (2.0 * Math.PI) / 12.8;
 
       double nominalVoltage = 12.0;
 
       // Your constant name says Rps, but your math produces meters/sec.
       // This keeps your behavior unchanged.  
-      double drivingVelocityFeedForward = nominalVoltage / ModuleConstants.kDriveWheelFreeSpeedRps;
+      double drivingVelocityFeedForward = nominalVoltage / ModuleConstants.kDriveWheelFreeVelocityMps;
 
       // -------------------- DRIVING --------------------
       drivingConfig
@@ -73,6 +74,15 @@ public final class Configs {
     public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
     static {
+
+      // NEO internal encoder reports rotations.
+      // We want to control how many degrees the end axle moves
+      // Since there is a gearbox on the motor, (5 in : 1 out), we multiply the encoder return by that ratio
+      double pivotFactor =
+              1 / 5.;
+      // Now, the PID and target position is in end axle rotations (the actual mechanism) instead of the raw motor rotations
+
+
         // Rollers (open loop)
         rollerConfig
             .idleMode(IdleMode.kBrake)
@@ -84,7 +94,7 @@ public final class Configs {
             .smartCurrentLimit(30);
 
         pivotConfig.encoder
-            .positionConversionFactor(1.0);
+            .positionConversionFactor(pivotFactor);
 
         pivotConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -102,6 +112,55 @@ public final class Configs {
             .smartCurrentLimit(50);
 
         
+    }
+  }
+
+  public static final class Outake {
+    public static final SparkMaxConfig shooterConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig feedgerConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig turretConfig = new SparkMaxConfig();
+
+    static {
+      double shooterFactor = ShooterConstants.kWheelCircumferenceMeters / ShooterConstants.kShootingMotorReduction;
+      double turretFactor = 1 / TurretConstants.kTurretMotorReduction;
+
+      double nominalVoltage = 12.0;
+
+      double shootingVelocityFeedForward =  nominalVoltage / ShooterConstants.kWheelFreeVelocityMps;
+
+      shooterConfig
+              .idleMode(IdleMode.kCoast)
+              .smartCurrentLimit(50);
+
+      turretConfig
+              .idleMode(IdleMode.kBrake)
+              .smartCurrentLimit(30);
+
+      feedgerConfig
+              .idleMode(IdleMode.kBrake)
+              .smartCurrentLimit(30);
+
+      shooterConfig.encoder
+              .positionConversionFactor(shooterFactor)         // meters
+              .velocityConversionFactor(shooterFactor / 60.0); // meters per second
+
+      turretConfig.encoder
+              .positionConversionFactor(turretFactor)         // rotations
+              .velocityConversionFactor(turretFactor / 60.0); // rotations per second
+
+      shooterConfig.closedLoop
+              .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+              // Example gains — tune for your robot
+              .pid(0.04, 0.0, 0)
+              .outputRange(-1.0, 1.0);
+
+      turretConfig.closedLoop
+              .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+              .pid(0.5, 0.0, 0)
+              .outputRange(-1.0, 1.0);
+
+      shooterConfig.closedLoop.feedForward
+              .kV(shootingVelocityFeedForward);
     }
   }
 

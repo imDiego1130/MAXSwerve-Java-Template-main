@@ -19,6 +19,9 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Outake.Feeder;
+import frc.robot.subsystems.Outake.Shooter;
+import frc.robot.subsystems.Outake.Turret;
 import frc.robot.subsystems.Spindexer;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -40,6 +43,9 @@ public class RobotContainer {
     private final IntakeRollers m_intakeRollers = new IntakeRollers();
     private final IntakePivot m_intakePivot = new IntakePivot();
     private final Spindexer m_spindexer = new Spindexer();
+    //private final Shooter m_shooter = new Shooter();
+    //private final Turret m_outake = new Turret();
+    //private final Feeder m_feeder = new Feeder();
 
     // The driver's controller
     XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);

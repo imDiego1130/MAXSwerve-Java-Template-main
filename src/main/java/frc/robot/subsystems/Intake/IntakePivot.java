@@ -15,16 +15,15 @@ public class IntakePivot extends SubsystemBase {
 
     // Motors
     private final SparkMax pivotMotor;
-    // private final SparkMax topRoller;
 
     // Encoder + PID (ONLY for pivot)
     private final RelativeEncoder pivotEncoder;
     private final SparkClosedLoopController pivotPID;
 
     // Preset Positions (example values — you must tune)
-    // deg
-    private static final double UP_POSITION = 0.380952;
-    private static final double DOWN_POSITION = 0.380952*4;
+    // in deg (we divide by 360 because the motor still talks in rotations)
+    private static final double UP_POSITION = (27.428544) /360;
+    private static final double DOWN_POSITION = (UP_POSITION + 90) /360;
 
     @SuppressWarnings("removal")
     public IntakePivot() {
@@ -49,14 +48,14 @@ public class IntakePivot extends SubsystemBase {
     // Pivot Control (Position)
     // =========================
 
-    @SuppressWarnings("removal")
+    //@SuppressWarnings("removal")
     public void raise() {
-        pivotPID.setReference(UP_POSITION, SparkMax.ControlType.kPosition);
+        pivotPID.setSetpoint(UP_POSITION, SparkMax.ControlType.kPosition);
     }
 
-    @SuppressWarnings("removal")
+    //@SuppressWarnings("removal")
     public void lower() {
-        pivotPID.setReference(DOWN_POSITION, SparkMax.ControlType.kPosition);
+        pivotPID.setSetpoint(DOWN_POSITION, SparkMax.ControlType.kPosition);
     }
 
     public double getPivotPosition() {
@@ -69,8 +68,7 @@ public class IntakePivot extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Pivot Position", pivotEncoder.getPosition());
-        SmartDashboard.putNumber("Pivot Target: ", pivotPID.getSetpoint());
+        SmartDashboard.putNumber("Pivot Deg: ", getPivotPosition()*360);
     }
 
 }
