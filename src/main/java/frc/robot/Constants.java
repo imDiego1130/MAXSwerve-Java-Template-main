@@ -118,7 +118,7 @@ public final class Constants {
     public static final double kWheelCircumferenceMeters =  kWheelDiameterMeters * Math.PI;
 
     public static final double kShootingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kShootingMotorReduction = (1);
+    public static final double kShootingMotorReduction = (48 / 84);
     public static final double kWheelFreeVelocityMps = (kShootingMotorFreeSpeedRps *  kWheelCircumferenceMeters)
             / kShootingMotorReduction;
 
@@ -130,7 +130,7 @@ public final class Constants {
     // example numbers
 
     public static final double kTurretMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kTurretMotorReduction = (5);
+    public static final double kTurretMotorReduction = (132/ 16.);
     public static final double kWheelFreeRps = kTurretMotorFreeSpeedRps / kTurretMotorReduction;
 
   }

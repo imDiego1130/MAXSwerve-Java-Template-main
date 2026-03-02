@@ -22,8 +22,8 @@ public class IntakePivot extends SubsystemBase {
 
     // Preset Positions (example values — you must tune)
     // in deg (we divide by 360 because the motor still talks in rotations)
-    private static final double UP_POSITION = (27.428544) /360;
-    private static final double DOWN_POSITION = (UP_POSITION + 90) /360;
+    private static final double UP_POSITION = (30) / 360;
+    private static final double DOWN_POSITION = (30 + 90) /360;
 
     @SuppressWarnings("removal")
     public IntakePivot() {
