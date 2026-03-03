@@ -77,12 +77,12 @@ public final class Constants {
     public static final int kDrivingMotorPinionTeeth = 14;
 
     // Calculations required for driving motor conversion factors and feed forward
-    public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
+    public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60.;
     public static final double kWheelDiameterMeters = 0.0889;
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
     // teeth on the bevel pinion
-    public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
+    public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15.);
     public static final double kDriveWheelFreeVelocityMps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
   }
@@ -117,19 +117,19 @@ public final class Constants {
     public static final double kWheelDiameterMeters = 0.08;
     public static final double kWheelCircumferenceMeters =  kWheelDiameterMeters * Math.PI;
 
-    public static final double kShootingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kShootingMotorReduction = (48 / 84);
+    public static final double kShootingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60.;
+    public static final double kShootingMotorReduction = (48 / 84.);
     public static final double kWheelFreeVelocityMps = (kShootingMotorFreeSpeedRps *  kWheelCircumferenceMeters)
             / kShootingMotorReduction;
 
-    public static final double kShooterEfficiencyCoefficient = 1;
+    public static final double kShooterEfficiencyCoefficient = 1.0;
 
   }
 
   public static final class TurretConstants {
     // example numbers
 
-    public static final double kTurretMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
+    public static final double kTurretMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60.;
     public static final double kTurretMotorReduction = (132/ 16.);
     public static final double kWheelFreeRps = kTurretMotorFreeSpeedRps / kTurretMotorReduction;
 

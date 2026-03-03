@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Outake;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -16,6 +17,10 @@ public class Turret extends SubsystemBase {
     private final SparkMax turret;
     private final RelativeEncoder turretEncoder;
     private final SparkClosedLoopController turretPID;
+    // IN DEGREES
+    private final double MIN_ANGLE = 0;
+    private final double MAX_ANGLE = 180;
+
     @SuppressWarnings("removal")
     public Turret() {
 
@@ -38,11 +43,17 @@ public class Turret extends SubsystemBase {
     }
 
     public void turnWithPower(double power) {
+        double pos =  turretEncoder.getPosition();
+        if (pos > MAX_ANGLE ||  pos < MIN_ANGLE) {
+            power = 0;
+        }
+
         turret.set(power);
     }
 
-    public void turnWithPosition(double rotations) {
-        turretPID.setSetpoint(rotations, SparkMax.ControlType.kVelocity);
+    public void turnWithPosition(double degrees) {
+        double clampedDegrees = Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, degrees));
+        turretPID.setSetpoint(clampedDegrees, SparkMax.ControlType.kPosition);
     }
 
     public void stop() {
@@ -51,7 +62,7 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Turret Position (Rotations): ", turretEncoder.getPosition());
+        SmartDashboard.putNumber("Turret Position (Degrees): ", turretEncoder.getPosition());
     }
 
 }

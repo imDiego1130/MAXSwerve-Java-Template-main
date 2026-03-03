@@ -12,12 +12,10 @@ public class Feeder extends SubsystemBase {
 
     // Motors
     private final SparkMax feeder;
-    // private final SparkMax topRoller;
     @SuppressWarnings("removal")
     public Feeder() {
 
         feeder = new SparkMax(13, MotorType.kBrushless);
-        //topRoller    = new SparkMax(15, MotorType.kBrushless);
 
         feeder.configure(
                 Configs.Outake.feedgerConfig,
@@ -30,19 +28,16 @@ public class Feeder extends SubsystemBase {
         );
     }
 
-    public void intakeIn() {
+    public void feedIn() {
         feeder.set(0.8);
-        //topRoller.set(0.8);
     }
 
-    public void intakeOut() {
+    public void feedOut() {
         feeder.set(-0.8);
-        //topRoller.set(-0.8);
     }
 
     public void stop() {
         feeder.set(0);
-        //topRoller.set(0);
     }
 
     @Override

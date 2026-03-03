@@ -79,7 +79,7 @@ public final class Configs {
       // We want to control how many degrees the end axle moves
       // Since there is a gearbox on the motor, (5 in : 1 out), we multiply the encoder return by that ratio
       double pivotFactor =
-              1 / 5.;
+              (1 / 5.) * 360;
       // Now, the PID and target position is in end axle rotations (the actual mechanism) instead of the raw motor rotations
 
 
@@ -94,11 +94,11 @@ public final class Configs {
             .smartCurrentLimit(30);
 
         pivotConfig.encoder
-            .positionConversionFactor(pivotFactor);
+            .positionConversionFactor(pivotFactor); // degrees
 
         pivotConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(0.5, 0.0, 1.0)
+            .pid(0.1, 0.0, 0.0)
             .outputRange(-1.0, 1.0);
     }
   }
@@ -111,7 +111,6 @@ public final class Configs {
             .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(50);
 
-        
     }
   }
 
@@ -122,7 +121,7 @@ public final class Configs {
 
     static {
       double shooterFactor = ShooterConstants.kWheelCircumferenceMeters / ShooterConstants.kShootingMotorReduction;
-      double turretFactor = 1 / TurretConstants.kTurretMotorReduction;
+      double turretFactor = (1 / TurretConstants.kTurretMotorReduction) * 360;
 
       double nominalVoltage = 12.0;
 
@@ -145,18 +144,17 @@ public final class Configs {
               .velocityConversionFactor(shooterFactor / 60.0); // meters per second
 
       turretConfig.encoder
-              .positionConversionFactor(turretFactor)         // rotations
-              .velocityConversionFactor(turretFactor / 60.0); // rotations per second
+              .positionConversionFactor(turretFactor)         // degrees
+              .velocityConversionFactor(turretFactor / 60.0); // degrees per second
 
       shooterConfig.closedLoop
               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-              // Example gains — tune for your robot
-              .pid(0.04, 0.0, 0)
+              .pid(0.1, 0.0, 0)
               .outputRange(-1.0, 1.0);
 
       turretConfig.closedLoop
               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-              .pid(0.5, 0.0, 0)
+              .pid(0.1, 0.0, 0)
               .outputRange(-1.0, 1.0);
 
       shooterConfig.closedLoop.feedForward

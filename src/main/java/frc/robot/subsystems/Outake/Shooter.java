@@ -16,6 +16,7 @@ public class Shooter extends SubsystemBase {
     private final SparkMax shooter;
     private final RelativeEncoder shooterEncoder;
     private final SparkClosedLoopController shooterPID;
+    // METERS (velocity in METERS/SEC)
     @SuppressWarnings("removal")
     public Shooter() {
 
