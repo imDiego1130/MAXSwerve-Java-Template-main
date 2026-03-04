@@ -108,12 +108,12 @@ public class RobotContainer {
 
         // Bumpers
         Trigger leftBumper = new Trigger(() -> m_driverController.getLeftBumperButton());
-        leftBumper.toggleOnTrue(
-                new RunCommand(() -> m_intakePivot.lower(), m_intakePivot)
+        leftBumper.onTrue(
+                new InstantCommand(() -> m_intakePivot.lower(), m_intakePivot)
         );
         Trigger rightBumper = new Trigger(() -> m_driverController.getRightBumperButton());
-        rightBumper.toggleOnTrue(
-                new RunCommand(() -> m_intakePivot.raise(), m_intakePivot)
+        rightBumper.onTrue(
+                new InstantCommand(() -> m_intakePivot.raise(), m_intakePivot)
         );
 
         // Spindexer

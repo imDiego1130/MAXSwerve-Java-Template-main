@@ -134,4 +134,10 @@ public final class Constants {
     public static final double kWheelFreeRps = kTurretMotorFreeSpeedRps / kTurretMotorReduction;
 
   }
+
+  public static final class PivotConstants {
+    public static final double kPivotMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60.;
+    public static final double kPivotMotorReduction = (10);
+    public static final double kPivotArmLengthMeters = 0.3175;
+  }
 }

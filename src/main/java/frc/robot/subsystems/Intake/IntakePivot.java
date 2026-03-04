@@ -39,7 +39,7 @@ public class IntakePivot extends SubsystemBase {
         pivotEncoder.setPosition(0);
 
         setDefaultCommand(
-                new RunCommand(() -> stop(), this)
+                new RunCommand(() -> {}, this)
         );
     }
 
@@ -66,6 +66,7 @@ public class IntakePivot extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Pivot Deg: ", getPivotPosition());
+        SmartDashboard.putNumber("Pivot Target: ", pivotPID.getSetpoint());
     }
 
 }

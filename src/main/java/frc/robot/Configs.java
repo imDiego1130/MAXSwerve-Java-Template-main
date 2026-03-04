@@ -7,6 +7,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants.PivotConstants;
 
 public final class Configs {
   public static final class MAXSwerveModule {
@@ -77,9 +78,12 @@ public final class Configs {
 
       // NEO internal encoder reports rotations.
       // We want to control how many degrees the end axle moves
-      // Since there is a gearbox on the motor, (5 in : 1 out), we multiply the encoder return by that ratio
+      // Since there is a gearbox on the motor, (10 in : 1 out), we multiply the encoder return by that ratio
       double pivotFactor =
-              (1 / 5.) * 360;
+              (1 / PivotConstants.kPivotMotorReduction) * 360;
+
+      double nominalVoltage = 12.0;
+
       // Now, the PID and target position is in end axle rotations (the actual mechanism) instead of the raw motor rotations
 
 
@@ -94,12 +98,16 @@ public final class Configs {
             .smartCurrentLimit(30);
 
         pivotConfig.encoder
-            .positionConversionFactor(pivotFactor); // degrees
+            .positionConversionFactor(pivotFactor) // degrees
+            .velocityConversionFactor(pivotFactor / 60.0); // degrees / second
 
         pivotConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(3.0, 0.0, 0.0)
             .outputRange(-1.0, 1.0);
+
+        pivotConfig.closedLoop.feedForward
+                .kCos(0.1);
     }
   }
   public static final class Spindexer {
