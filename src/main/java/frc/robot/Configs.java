@@ -98,7 +98,7 @@ public final class Configs {
 
         pivotConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(0.1, 0.0, 0.0)
+            .pid(3.0, 0.0, 0.0)
             .outputRange(-1.0, 1.0);
     }
   }

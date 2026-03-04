@@ -5,7 +5,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,7 +22,7 @@ public class IntakePivot extends SubsystemBase {
     // Preset Positions
     // in deg
     private static final double UP_POSITION = 30;
-    private static final double DOWN_POSITION = UP_POSITION + 90;
+    private static final double DOWN_POSITION = 90;
 
     @SuppressWarnings("removal")
     public IntakePivot() {

@@ -20,7 +20,7 @@ public class Shooter extends SubsystemBase {
     @SuppressWarnings("removal")
     public Shooter() {
 
-        shooter = new SparkMax(20, MotorType.kBrushless);
+        shooter = new SparkMax(19, MotorType.kBrushless);
 
         shooter.configure(
                 Configs.Outake.shooterConfig,
