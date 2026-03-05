@@ -15,7 +15,7 @@ public class Feeder extends SubsystemBase {
     @SuppressWarnings("removal")
     public Feeder() {
 
-        feeder = new SparkMax(13, MotorType.kBrushless);
+        feeder = new SparkMax(21, MotorType.kBrushless);
 
         feeder.configure(
                 Configs.Outake.feedgerConfig,

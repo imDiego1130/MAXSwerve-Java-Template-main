@@ -82,8 +82,6 @@ public final class Configs {
       double pivotFactor =
               (1 / PivotConstants.kPivotMotorReduction) * 360;
 
-      double nominalVoltage = 12.0;
-
       // Now, the PID and target position is in end axle rotations (the actual mechanism) instead of the raw motor rotations
 
 
@@ -105,9 +103,6 @@ public final class Configs {
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(3.0, 0.0, 0.0)
             .outputRange(-1.0, 1.0);
-
-        pivotConfig.closedLoop.feedForward
-                .kCos(0.1);
     }
   }
   public static final class Spindexer {

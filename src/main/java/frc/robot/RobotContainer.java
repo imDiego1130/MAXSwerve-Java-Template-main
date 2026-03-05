@@ -19,8 +19,8 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
-/* 
 import frc.robot.subsystems.Outake.Feeder;
+/* 
 import frc.robot.subsystems.Outake.Shooter;
 import frc.robot.subsystems.Outake.Turret;
 */
@@ -117,15 +117,22 @@ public class RobotContainer {
         );
 
         // Spindexer
-        Trigger buttonA = new Trigger(() -> m_operatorController.getLeftTriggerAxis() > 0.03);
-        buttonA.whileTrue(
+        Trigger leftTrigger2 = new Trigger(() -> m_operatorController.getLeftTriggerAxis() > 0.03);
+        leftTrigger2.whileTrue(
                 new RunCommand(() -> m_spindexer.spinClockwise(m_operatorController.getLeftTriggerAxis() ), m_spindexer)
         );
 
-        Trigger buttonY = new Trigger(() -> m_operatorController.getRightTriggerAxis() > 0.03);
-        buttonY.whileTrue(
+        Trigger rightTrigger2 = new Trigger(() -> m_operatorController.getRightTriggerAxis() > 0.03);
+        rightTrigger2.whileTrue(
                 new RunCommand(() -> m_spindexer.spinCounterClockwise(m_operatorController.getRightTriggerAxis()), m_spindexer)
         );
+
+        // Feeder
+        /*Trigger buttonB = new Trigger(() -> m_operatorController.getBButton());
+        buttonB.whileTrue(
+                new RunCommand(() -> m_feeder.feedIn(), m_feeder)
+        );
+        */
     }
 
     /**
