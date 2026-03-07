@@ -42,14 +42,14 @@ import frc.robot.subsystems.Intake.IntakeRollers;
  */
 public class RobotContainer {
     // The robot's subsystems
-    private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    private final IntakeRollers m_intakeRollers = new IntakeRollers();
-    private final IntakePivot m_intakePivot = new IntakePivot();
-    private final Spindexer m_spindexer = new Spindexer();
-    //private final Shooter m_shooter = new Shooter();
-    //private final Turret m_turret = new Turret();
-    private final Feeder m_feeder = new Feeder();
-    //private final Climber m_climber = new Climber();
+    public DriveSubsystem m_robotDrive;
+    private IntakeRollers m_intakeRollers;
+    private IntakePivot m_intakePivot;
+    private Spindexer m_spindexer;
+    //private Shooter m_shooter;
+    //private Turret m_turret;
+    private Feeder m_feeder;
+    //private Climber m_climber = new Climber();
 
     // The driver's controller
     XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -60,6 +60,12 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
+        m_robotDrive = new DriveSubsystem();
+        m_intakeRollers = new IntakeRollers();
+        m_intakePivot = new IntakePivot();
+        m_spindexer = new Spindexer();
+        m_feeder = new Feeder();
+
         // Configure the button bindings
         configureButtonBindings();
 

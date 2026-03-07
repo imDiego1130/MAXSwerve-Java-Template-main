@@ -24,65 +24,69 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
-  private final MAXSwerveModule m_frontLeft; 
+  private MAXSwerveModule m_frontLeft;
 
-  private final MAXSwerveModule m_frontRight;
+  private MAXSwerveModule m_frontRight;
 
-  private final MAXSwerveModule m_rearLeft; 
+  private MAXSwerveModule m_rearLeft;
 
-  private final MAXSwerveModule m_rearRight; 
+  private MAXSwerveModule m_rearRight;
 
   // The gyro sensor
   //private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
-  private final AHRS m_gyro; 
+  private AHRS m_gyro;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry; 
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+
+
+    // Usage reporting for MAXSwerve template
+    HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+  }
+
+  public final void initialize(){
     m_frontLeft = new MAXSwerveModule(
-      DriveConstants.kFrontLeftDrivingCanId,
-      DriveConstants.kFrontLeftTurningCanId,
-      DriveConstants.kFrontLeftTurningCanCoderId,
-      DriveConstants.kFrontLeftChassisAngularOffset,
-      DriveConstants.kFrontLeftDrivingInvertDirection    );
+            DriveConstants.kFrontLeftDrivingCanId,
+            DriveConstants.kFrontLeftTurningCanId,
+            DriveConstants.kFrontLeftTurningCanCoderId,
+            DriveConstants.kFrontLeftChassisAngularOffset,
+            DriveConstants.kFrontLeftDrivingInvertDirection    );
 
     m_frontRight = new MAXSwerveModule(
-      DriveConstants.kFrontRightDrivingCanId,
-      DriveConstants.kFrontRightTurningCanId,
-      DriveConstants.kFrontRightTurningCanCoderId,
-      DriveConstants.kFrontRightChassisAngularOffset,
-      DriveConstants.kFrontRightDrivingInvertDirection);
+            DriveConstants.kFrontRightDrivingCanId,
+            DriveConstants.kFrontRightTurningCanId,
+            DriveConstants.kFrontRightTurningCanCoderId,
+            DriveConstants.kFrontRightChassisAngularOffset,
+            DriveConstants.kFrontRightDrivingInvertDirection);
 
     m_rearLeft = new MAXSwerveModule(
-      DriveConstants.kRearLeftDrivingCanId,
-      DriveConstants.kRearLeftTurningCanId,
-      DriveConstants.kRearLeftTurningCanCoderId,
-      DriveConstants.kBackLeftChassisAngularOffset,
-      DriveConstants.kRearLeftDrivingInvertDirection);
+            DriveConstants.kRearLeftDrivingCanId,
+            DriveConstants.kRearLeftTurningCanId,
+            DriveConstants.kRearLeftTurningCanCoderId,
+            DriveConstants.kBackLeftChassisAngularOffset,
+            DriveConstants.kRearLeftDrivingInvertDirection);
 
     m_rearRight = new MAXSwerveModule(
-      DriveConstants.kRearRightDrivingCanId,
-      DriveConstants.kRearRightTurningCanId,
-      DriveConstants.kRearRightTurningCanCoderId,
-      DriveConstants.kBackRightChassisAngularOffset,
-      DriveConstants.kRearRightDrivingInvertDirection);
+            DriveConstants.kRearRightDrivingCanId,
+            DriveConstants.kRearRightTurningCanId,
+            DriveConstants.kRearRightTurningCanCoderId,
+            DriveConstants.kBackRightChassisAngularOffset,
+            DriveConstants.kRearRightDrivingInvertDirection);
 
     m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
     m_odometry = new SwerveDriveOdometry(
-      DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_gyro.getYaw()),
-      new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-      });
-
-    // Usage reporting for MAXSwerve template
-    HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+            DriveConstants.kDriveKinematics,
+            Rotation2d.fromDegrees(m_gyro.getYaw()),
+            new SwerveModulePosition[] {
+                    m_frontLeft.getPosition(),
+                    m_frontRight.getPosition(),
+                    m_rearLeft.getPosition(),
+                    m_rearRight.getPosition()
+            });
   }
 
   @Override
