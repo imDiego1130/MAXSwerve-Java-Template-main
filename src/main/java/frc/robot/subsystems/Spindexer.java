@@ -32,13 +32,13 @@ public class Spindexer extends SubsystemBase {
 
     public void spinClockwise(double power) {
         power = Math.abs(power);
-        power = Math.min(power, 0.8);
+        power = Math.min(power, 0.6);
         spindexer.set(-power);
     }
 
     public void spinCounterClockwise(double power) {
         power = Math.abs(power);
-        power = Math.min(power, 0.8);
+        power = Math.min(power, 0.6);
         spindexer.set(power);
     }
 

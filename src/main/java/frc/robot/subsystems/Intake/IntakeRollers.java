@@ -41,13 +41,13 @@ public class IntakeRollers extends SubsystemBase {
     // =========================
 
     public void intakeIn() {
-        groundRoller.set(0.5);
-        topRoller.set(0.5);
+        groundRoller.set(0.7);
+        topRoller.set(-0.7);
     }
 
     public void intakeOut() {
-        groundRoller.set(-0.5);
-        topRoller.set(-0.5);
+        groundRoller.set(-0.7);
+        topRoller.set(0.7);
     }
 
     public void stop() {

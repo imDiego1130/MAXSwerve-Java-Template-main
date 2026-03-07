@@ -8,6 +8,7 @@ import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.Constants.PivotConstants;
+import frc.robot.Constants.ClimberConstants;
 
 public final class Configs {
   public static final class MAXSwerveModule {
@@ -132,6 +133,7 @@ public final class Configs {
 
       shooterConfig
               .idleMode(IdleMode.kCoast)
+              .inverted(true) // shooter is geared, invert direction (+ direction shoots out)
               .smartCurrentLimit(50);
 
       turretConfig
@@ -162,6 +164,28 @@ public final class Configs {
 
       shooterConfig.closedLoop.feedForward
               .kV(shootingVelocityFeedForward);
+    }
+  }
+
+  public static final class Climber {
+
+    public static final SparkMaxConfig climberConfig = new SparkMaxConfig();
+
+    static {
+      double climberFactor = (ClimberConstants.kClimberSpoolCircumference / ClimberConstants.kClimberMotorReduction);
+
+      climberConfig
+              .idleMode(IdleMode.kBrake)
+              .smartCurrentLimit(50);
+
+      climberConfig.encoder
+              .positionConversionFactor(climberFactor)         // meters
+              .velocityConversionFactor(climberFactor / 60.0); // meters per second
+
+      climberConfig.closedLoop
+              .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+              .pid(1.0, 0.0, 0)
+              .outputRange(-1.0, 1.0);
     }
   }
 

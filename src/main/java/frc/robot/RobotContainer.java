@@ -23,6 +23,7 @@ import frc.robot.subsystems.Outake.Feeder;
 /* 
 import frc.robot.subsystems.Outake.Shooter;
 import frc.robot.subsystems.Outake.Turret;
+import frc.robot.subsystems.Climber;
 */
 import frc.robot.subsystems.Spindexer;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -47,7 +48,8 @@ public class RobotContainer {
     private final Spindexer m_spindexer = new Spindexer();
     //private final Shooter m_shooter = new Shooter();
     //private final Turret m_turret = new Turret();
-    //private final Feeder m_feeder = new Feeder();
+    private final Feeder m_feeder = new Feeder();
+    //private final Climber m_climber = new Climber();
 
     // The driver's controller
     XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -96,15 +98,18 @@ public class RobotContainer {
                         m_robotDrive));
 
         // Triggers
+        /* 
         Trigger rightTrigger = new Trigger(() -> m_driverController.getRightTriggerAxis() > 0.2);
         rightTrigger.whileTrue(
                 new RunCommand(() -> m_intakeRollers.intakeIn(), m_intakeRollers)
         );
+        
 
         Trigger leftTrigger = new Trigger(() -> m_driverController.getLeftTriggerAxis() > 0.2);
         leftTrigger.whileTrue(
                 new RunCommand(() -> m_intakeRollers.intakeOut(), m_intakeRollers)
         );
+        */
 
         // Bumpers
         Trigger leftBumper = new Trigger(() -> m_driverController.getLeftBumperButton());
@@ -124,15 +129,15 @@ public class RobotContainer {
 
         Trigger rightTrigger2 = new Trigger(() -> m_operatorController.getRightTriggerAxis() > 0.03);
         rightTrigger2.whileTrue(
-                new RunCommand(() -> m_spindexer.spinCounterClockwise(m_operatorController.getRightTriggerAxis()), m_spindexer)
+                new RunCommand(() -> m_intakeRollers.intakeIn(), m_intakeRollers)
         );
 
         // Feeder
-        /*Trigger buttonB = new Trigger(() -> m_operatorController.getBButton());
+        Trigger buttonB = new Trigger(() -> m_operatorController.getBButton());
         buttonB.whileTrue(
                 new RunCommand(() -> m_feeder.feedIn(), m_feeder)
         );
-        */
+        
     }
 
     /**

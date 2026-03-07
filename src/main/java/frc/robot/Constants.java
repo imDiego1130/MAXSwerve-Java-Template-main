@@ -140,4 +140,11 @@ public final class Constants {
     public static final double kPivotMotorReduction = (10);
     public static final double kPivotArmLengthMeters = 0.3175;
   }
+
+  public static final class ClimberConstants {
+    public static final double kClimberMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60.;
+    public static final double kClimberMotorReduction = (10);
+    public static final double kClimberSpoolDiameterMeters = (0.02);
+    public static final double kClimberSpoolCircumference = Math.PI * kClimberSpoolDiameterMeters;
+  }
 }
