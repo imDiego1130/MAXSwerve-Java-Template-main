@@ -84,24 +84,22 @@ public class RobotContainer {
                                 true),
                         m_robotDrive));
 
-        /*                  
-        m_turret.setDefaultCommand(
-                new RunCommand(
-                 MathUtil.applyDeadband(Math.abs(m_operatorController.getLeftX()), OIConstants.kDriveDeadband) > OIConstants.kDriveDeadband &&
-                 MathUtil.applyDeadband(Math.abs(m_operatorController.getLeftY()), OIConstants.kDriveDeadband) > OIConstants.kDriveDeadband ?
-                        () -> m_turret.turnToPosition(
-                                Math.toDegrees(-Math.abs(Math.atan2(
-                                        MathUtil.applyDeadband(-m_operatorController.getLeftY(), OIConstants.kDriveDeadband),
-                                        MathUtil.applyDeadband( m_operatorController.getLeftX(), OIConstants.kDriveDeadband)))) )
-                        :
-                        () -> m_turret.turnToPosition(),
-                        m_turret)
 
-        );
-        */
         m_turret.setDefaultCommand(
-                new RunCommand(
-                        () -> m_turret.turnToPosition(-180*Math.abs(MathUtil.applyDeadband(m_operatorController.getLeftX(), OIConstants.kDriveDeadband))), m_turret)
+                new RunCommand(() -> {
+                    double x = MathUtil.applyDeadband(m_operatorController.getLeftX(), 0.05);
+                    double y = MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.05);
+
+                    if (Math.abs(x) < 0.05 && Math.abs(y) < 0.05) {
+                        m_turret.turnToPosition();
+                    } else {
+                        double angle = Math.toDegrees(Math.atan2(y,x));
+                        if (angle < 0){
+                            angle += 180;
+                        }
+                        m_turret.turnToPosition(-angle);
+                    }
+                }, m_turret)
         );
         
     }
