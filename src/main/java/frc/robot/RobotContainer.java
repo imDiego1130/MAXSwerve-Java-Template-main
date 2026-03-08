@@ -20,9 +20,10 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Outake.Feeder;
-/* 
-import frc.robot.subsystems.Outake.Shooter;
 import frc.robot.subsystems.Outake.Turret;
+ 
+import frc.robot.subsystems.Outake.Shooter;
+/* 
 import frc.robot.subsystems.Climber;
 */
 import frc.robot.subsystems.Spindexer;
@@ -46,8 +47,8 @@ public class RobotContainer {
     private IntakeRollers m_intakeRollers;
     private IntakePivot m_intakePivot;
     private Spindexer m_spindexer;
-    //private Shooter m_shooter;
-    //private Turret m_turret;
+    private Shooter m_shooter;
+    private Turret m_turret;
     private Feeder m_feeder;
     //private Climber m_climber = new Climber();
 
@@ -65,6 +66,8 @@ public class RobotContainer {
         m_intakePivot = new IntakePivot();
         m_spindexer = new Spindexer();
         m_feeder = new Feeder();
+        m_turret = new Turret(m_robotDrive.getGyroObject());
+        m_shooter = new Shooter();
 
         // Configure the button bindings
         configureButtonBindings();
@@ -80,6 +83,27 @@ public class RobotContainer {
                                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                                 true),
                         m_robotDrive));
+
+        /*                  
+        m_turret.setDefaultCommand(
+                new RunCommand(
+                 MathUtil.applyDeadband(Math.abs(m_operatorController.getLeftX()), OIConstants.kDriveDeadband) > OIConstants.kDriveDeadband &&
+                 MathUtil.applyDeadband(Math.abs(m_operatorController.getLeftY()), OIConstants.kDriveDeadband) > OIConstants.kDriveDeadband ?
+                        () -> m_turret.turnToPosition(
+                                Math.toDegrees(-Math.abs(Math.atan2(
+                                        MathUtil.applyDeadband(-m_operatorController.getLeftY(), OIConstants.kDriveDeadband),
+                                        MathUtil.applyDeadband( m_operatorController.getLeftX(), OIConstants.kDriveDeadband)))) )
+                        :
+                        () -> m_turret.turnToPosition(),
+                        m_turret)
+
+        );
+        */
+        m_turret.setDefaultCommand(
+                new RunCommand(
+                        () -> m_turret.turnToPosition(-180*Math.abs(MathUtil.applyDeadband(m_operatorController.getLeftX(), OIConstants.kDriveDeadband))), m_turret)
+        );
+        
     }
 
     /**
@@ -98,13 +122,15 @@ public class RobotContainer {
                         () -> m_robotDrive.setX(),
                         m_robotDrive));
 
+        
         new JoystickButton(m_driverController, XboxController.Button.kStart.value)
                 .onTrue(new InstantCommand(
                         () -> m_robotDrive.zeroHeading(),
                         m_robotDrive));
+                        
 
         // Triggers
-        /* 
+         
         Trigger rightTrigger = new Trigger(() -> m_driverController.getRightTriggerAxis() > 0.2);
         rightTrigger.whileTrue(
                 new RunCommand(() -> m_intakeRollers.intakeIn(), m_intakeRollers)
@@ -115,7 +141,7 @@ public class RobotContainer {
         leftTrigger.whileTrue(
                 new RunCommand(() -> m_intakeRollers.intakeOut(), m_intakeRollers)
         );
-        */
+        
 
         // Bumpers
         Trigger leftBumper = new Trigger(() -> m_driverController.getLeftBumperButton());
@@ -133,15 +159,28 @@ public class RobotContainer {
                 new RunCommand(() -> m_spindexer.spinClockwise(m_operatorController.getLeftTriggerAxis() ), m_spindexer)
         );
 
+        /* 
         Trigger rightTrigger2 = new Trigger(() -> m_operatorController.getRightTriggerAxis() > 0.03);
         rightTrigger2.whileTrue(
                 new RunCommand(() -> m_intakeRollers.intakeIn(), m_intakeRollers)
         );
+        */
 
         // Feeder
         Trigger buttonB = new Trigger(() -> m_operatorController.getBButton());
         buttonB.whileTrue(
                 new RunCommand(() -> m_feeder.feedIn(), m_feeder)
+        );
+
+        // Turret
+        Trigger buttonX = new Trigger(() -> m_operatorController.getXButtonPressed());
+        buttonX.onTrue(
+                new RunCommand(() -> m_turret.turnToPosition(0), m_turret)
+        );
+
+        Trigger buttonY = new Trigger(() -> m_operatorController.getYButtonPressed());
+        buttonY.onTrue(
+                new RunCommand(() -> m_shooter.spinWithVelocity(30), m_shooter)
         );
         
     }

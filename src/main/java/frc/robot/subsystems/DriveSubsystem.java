@@ -78,6 +78,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
+    zeroHeading();
+
     m_odometry = new SwerveDriveOdometry(
             DriveConstants.kDriveKinematics,
             Rotation2d.fromDegrees(m_gyro.getYaw()),
@@ -101,6 +103,11 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
     SmartDashboard.putNumber("Gyro Angle: ", getHeading());
+    SmartDashboard.putNumber("frontLeft  Pos: ", m_frontLeft.getPosition().distanceMeters);
+    SmartDashboard.putNumber("frontRight Pos: ", m_frontRight.getPosition().distanceMeters);
+    SmartDashboard.putNumber("rearLeft   Pos: ", m_rearLeft.getPosition().distanceMeters);
+    SmartDashboard.putNumber("rearRight  Pos: ", m_rearRight.getPosition().distanceMeters);
+    SmartDashboard.putNumberArray("Pose meters (x), (y): ", new double[]{m_odometry.getPoseMeters().getX(), m_odometry.getPoseMeters().getY()});
   }
 
   /**
@@ -201,6 +208,10 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getHeading() {
   return m_gyro.getYaw();
+  }
+
+  public AHRS getGyroObject(){
+    return m_gyro;
   }
 
   /**
