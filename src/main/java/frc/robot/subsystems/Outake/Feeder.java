@@ -23,21 +23,27 @@ public class Feeder extends SubsystemBase {
                 SparkMax.PersistMode.kPersistParameters
         );
 
+        /* 
         setDefaultCommand(
                 new RunCommand(() -> stop(), this)
         );
+        */
     }
 
     public void feedIn() {
-        feeder.set(0.8);
+        feeder.set(-1);
     }
 
     public void feedOut() {
-        feeder.set(-0.8);
+        feeder.set(1);
     }
 
     public void stop() {
         feeder.set(0);
+    }
+
+    public double getRPM(){
+        return feeder.getEncoder().getVelocity();
     }
 
     @Override

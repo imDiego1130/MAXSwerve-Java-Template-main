@@ -78,10 +78,10 @@ public class RobotContainer {
                 // Turning is controlled by the X axis of the right stick.
                 new RunCommand(
                         () -> m_robotDrive.drive(
-                                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                                true),
+                                -0.8*MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+                                -0.8*MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                                -0.8*MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                                false),
                         m_robotDrive));
 
 
@@ -101,6 +101,21 @@ public class RobotContainer {
                     }
                 }, m_turret)
         );
+
+         
+        m_shooter.setDefaultCommand(
+                new RunCommand(() -> {
+                    double y = MathUtil.applyDeadband(-m_operatorController.getRightY(), 0.1);
+                    double vel = m_shooter.getTargetVelocity();
+                    if (vel > 0) {
+                        m_shooter.spinWithVelocity(m_shooter.getTargetVelocity()+y);
+                    } else {
+                        m_shooter.spinWithVelocity(0);
+                    }
+                        
+                }, m_shooter)
+        );
+        
         
     }
 
@@ -151,10 +166,17 @@ public class RobotContainer {
                 new InstantCommand(() -> m_intakePivot.raise(), m_intakePivot)
         );
 
+        // OPERATOR CONTROLLER
+
         // Spindexer
         Trigger leftTrigger2 = new Trigger(() -> m_operatorController.getLeftTriggerAxis() > 0.03);
         leftTrigger2.whileTrue(
-                new RunCommand(() -> m_spindexer.spinClockwise(m_operatorController.getLeftTriggerAxis() ), m_spindexer)
+                new RunCommand(() -> {
+                        if (m_feeder.getRPM() <= -1000) {
+                                m_spindexer.spinClockwise(m_operatorController.getLeftTriggerAxis() );
+                        }
+                        m_feeder.feedIn();
+                }, m_spindexer, m_feeder)
         );
 
         /* 
@@ -166,19 +188,37 @@ public class RobotContainer {
 
         // Feeder
         Trigger buttonB = new Trigger(() -> m_operatorController.getBButton());
-        buttonB.whileTrue(
-                new RunCommand(() -> m_feeder.feedIn(), m_feeder)
+        buttonB.onTrue(
+                new RunCommand(() -> {
+                        m_spindexer.stop();
+                        m_shooter.stop();
+                        m_feeder.stop();
+                }, m_shooter)
         );
 
         // Turret
         Trigger buttonX = new Trigger(() -> m_operatorController.getXButtonPressed());
         buttonX.onTrue(
-                new RunCommand(() -> m_turret.turnToPosition(0), m_turret)
+                new RunCommand(() -> {
+                        if (m_turret.isMaintainingHeading()) {
+                                m_turret.maintainHeading(false);
+                        } else {
+                                m_turret.maintainHeading(true);
+                        }
+                }, m_turret)
         );
 
         Trigger buttonY = new Trigger(() -> m_operatorController.getYButtonPressed());
         buttonY.onTrue(
-                new RunCommand(() -> m_shooter.spinWithVelocity(30), m_shooter)
+                new RunCommand(() -> {
+                        if (m_shooter.getTurnOff()) {
+                                m_shooter.turnOff(false);
+                                m_shooter.stop();
+                        } else {
+                                m_shooter.turnOff(true);
+                                m_shooter.spinWithVelocity(5.5);
+                        }
+                }, m_shooter)
         );
         
     }

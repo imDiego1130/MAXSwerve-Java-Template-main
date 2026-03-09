@@ -16,6 +16,8 @@ public class Shooter extends SubsystemBase {
     private final SparkMax shooter;
     private final RelativeEncoder shooterEncoder;
     private final SparkClosedLoopController shooterPID;
+    private double targetVelocity = 0;
+    private boolean turnOff = false;
     // METERS (velocity in METERS/SEC)
     @SuppressWarnings("removal")
     public Shooter() {
@@ -43,11 +45,28 @@ public class Shooter extends SubsystemBase {
     }
 
     public void spinWithVelocity(double velocity) {
-        shooterPID.setSetpoint(velocity, SparkMax.ControlType.kVelocity);
+        targetVelocity = velocity;
+        shooterPID.setSetpoint(targetVelocity, SparkMax.ControlType.kVelocity);
     }
 
     public void stop() {
         shooter.set(0);
+    }
+
+    public double getPower(){
+        return shooter.get();
+    }
+
+    public double getTargetVelocity(){
+        return targetVelocity;
+    }
+
+    public boolean getTurnOff(){
+        return turnOff;
+    }
+
+    public void turnOff(boolean bool){
+        turnOff = bool;
     }
 
     @Override
