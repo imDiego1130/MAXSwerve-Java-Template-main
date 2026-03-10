@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -37,7 +38,7 @@ public class DriveSubsystem extends SubsystemBase {
   private AHRS m_gyro;
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry; 
+  public SwerveDrivePoseEstimator m_odometry; 
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -80,7 +81,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     zeroHeading();
 
-    m_odometry = new SwerveDriveOdometry(
+    m_odometry = new SwerveDrivePoseEstimator(
             DriveConstants.kDriveKinematics,
             Rotation2d.fromDegrees(m_gyro.getYaw()),
             new SwerveModulePosition[] {
@@ -88,7 +89,8 @@ public class DriveSubsystem extends SubsystemBase {
                     m_frontRight.getPosition(),
                     m_rearLeft.getPosition(),
                     m_rearRight.getPosition()
-            });
+            },
+            new Pose2d());
   }
 
   @Override
@@ -107,7 +109,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("frontRight Pos: ", m_frontRight.getPosition().distanceMeters);
     SmartDashboard.putNumber("rearLeft   Pos: ", m_rearLeft.getPosition().distanceMeters);
     SmartDashboard.putNumber("rearRight  Pos: ", m_rearRight.getPosition().distanceMeters);
-    SmartDashboard.putNumberArray("Pose meters (x), (y): ", new double[]{m_odometry.getPoseMeters().getX(), m_odometry.getPoseMeters().getY()});
+    SmartDashboard.putNumberArray("Pose meters (x), (y): ", new double[]{m_odometry.getEstimatedPosition().getX(), m_odometry.getEstimatedPosition().getY()});
   }
 
   /**
@@ -116,7 +118,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_odometry.getEstimatedPosition();
   }
 
   /**

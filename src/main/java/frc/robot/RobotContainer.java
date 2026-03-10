@@ -19,6 +19,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Outake.Feeder;
 import frc.robot.subsystems.Outake.Turret;
  
@@ -50,6 +51,7 @@ public class RobotContainer {
     private Shooter m_shooter;
     private Turret m_turret;
     private Feeder m_feeder;
+    private Limelight m_limelight;
     //private Climber m_climber = new Climber();
 
     // The driver's controller
@@ -68,6 +70,8 @@ public class RobotContainer {
         m_feeder = new Feeder();
         m_turret = new Turret(m_robotDrive.getGyroObject());
         m_shooter = new Shooter();
+        m_limelight = new Limelight(m_robotDrive.m_odometry, m_turret);
+        
 
         // Configure the button bindings
         configureButtonBindings();
@@ -87,17 +91,21 @@ public class RobotContainer {
 
         m_turret.setDefaultCommand(
                 new RunCommand(() -> {
-                    double x = MathUtil.applyDeadband(m_operatorController.getLeftX(), 0.05);
-                    double y = MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.05);
-
-                    if (Math.abs(x) < 0.05 && Math.abs(y) < 0.05) {
-                        m_turret.turnToPosition();
+                    if (m_turret.isMaintainingHeading) {
+                        m_turret.turnToPosition(m_limelight.calculatedErrorAngle);
                     } else {
-                        double angle = Math.toDegrees(Math.atan2(y,x));
-                        if (angle < 0){
-                            angle += 180;
+                        double x = MathUtil.applyDeadband(m_operatorController.getLeftX(), 0.05);
+                        double y = MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.05);
+
+                        if (Math.abs(x) < 0.05 && Math.abs(y) < 0.05) {
+                                m_turret.turnToPosition();
+                        } else {
+                                double angle = Math.toDegrees(Math.atan2(y,x)) - 90;
+                                if (angle < 0){
+                                angle += 180;
+                                }
+                                m_turret.turnToPosition(-angle);
                         }
-                        m_turret.turnToPosition(-angle);
                     }
                 }, m_turret)
         );
@@ -200,11 +208,7 @@ public class RobotContainer {
         Trigger buttonX = new Trigger(() -> m_operatorController.getXButtonPressed());
         buttonX.onTrue(
                 new RunCommand(() -> {
-                        if (m_turret.isMaintainingHeading()) {
-                                m_turret.maintainHeading(false);
-                        } else {
-                                m_turret.maintainHeading(true);
-                        }
+                        m_turret.isMaintainingHeading = !m_turret.isMaintainingHeading;
                 }, m_turret)
         );
 

@@ -138,7 +138,7 @@ public final class Configs {
 
       turretConfig
               .idleMode(IdleMode.kBrake)
-              .inverted(true)
+              .inverted(false)
               .smartCurrentLimit(30);
 
       
@@ -168,8 +168,8 @@ public final class Configs {
               .kV(shootingVelocityFeedForward);
 
       turretConfig.softLimit
-              .forwardSoftLimit(1)
-              .reverseSoftLimit(-181);
+              .forwardSoftLimit(91)
+              .reverseSoftLimit(-91);
     }
   }
 

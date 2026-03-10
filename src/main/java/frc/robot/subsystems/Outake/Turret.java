@@ -19,9 +19,9 @@ public class Turret extends SubsystemBase {
     private final SparkClosedLoopController turretPID;
     // IN DEGREES
     // + in position is cw rotation
-    private final double MIN_ANGLE = -180;
-    private final double MAX_ANGLE = 0;
-    private boolean isMaintainingHeading = false;
+    private final double MIN_ANGLE = -90;
+    private final double MAX_ANGLE = 90;
+    public boolean isMaintainingHeading = false;
     private double trackAroundHeading = 0;
     private double target = 0;
     private AHRS m_gyro;
@@ -39,7 +39,7 @@ public class Turret extends SubsystemBase {
 
         turretPID = turret.getClosedLoopController();
         turretEncoder = turret.getEncoder();
-        turretEncoder.setPosition(0);
+        turretEncoder.setPosition(-90);
 
         m_gyro = gyro;
 
@@ -84,6 +84,10 @@ public class Turret extends SubsystemBase {
 
     public boolean isMaintainingHeading(){
         return isMaintainingHeading;
+    }
+
+    public double getPosition(){
+        return turretEncoder.getPosition();
     }
 
     @Override
