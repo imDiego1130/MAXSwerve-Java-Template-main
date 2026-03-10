@@ -70,7 +70,6 @@ public class RobotContainer {
         m_feeder = new Feeder();
         m_turret = new Turret(m_robotDrive.getGyroObject());
         m_shooter = new Shooter();
-        m_limelight = new Limelight(m_robotDrive.m_odometry, m_turret);
         
 
         // Configure the button bindings
@@ -92,7 +91,7 @@ public class RobotContainer {
         m_turret.setDefaultCommand(
                 new RunCommand(() -> {
                     if (m_turret.isMaintainingHeading) {
-                        m_turret.turnToPosition(m_limelight.calculatedErrorAngle);
+                        m_turret.turnToPosition(m_limelight.calculatedTargetAngleDegrees);
                     } else {
                         double x = MathUtil.applyDeadband(m_operatorController.getLeftX(), 0.05);
                         double y = MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.05);
@@ -102,9 +101,9 @@ public class RobotContainer {
                         } else {
                                 double angle = Math.toDegrees(Math.atan2(y,x)) - 90;
                                 if (angle < 0){
-                                angle += 180;
+                                    angle += 180;
                                 }
-                                m_turret.turnToPosition(-angle);
+                                m_turret.turnToPosition(angle);
                         }
                     }
                 }, m_turret)
@@ -125,6 +124,10 @@ public class RobotContainer {
         );
         
         
+    }
+
+    public void initLimelight(){
+        m_limelight = new Limelight(m_robotDrive.m_odometry, m_turret);
     }
 
     /**
@@ -207,9 +210,7 @@ public class RobotContainer {
         // Turret
         Trigger buttonX = new Trigger(() -> m_operatorController.getXButtonPressed());
         buttonX.onTrue(
-                new RunCommand(() -> {
-                        m_turret.isMaintainingHeading = !m_turret.isMaintainingHeading;
-                }, m_turret)
+                new InstantCommand(() -> m_turret.isMaintainingHeading = !m_turret.isMaintainingHeading, m_turret)
         );
 
         Trigger buttonY = new Trigger(() -> m_operatorController.getYButtonPressed());

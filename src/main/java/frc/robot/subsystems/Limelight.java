@@ -28,9 +28,9 @@ public class Limelight extends SubsystemBase {
      * should be the angle that faces the CAMERA, NOT the angle that faces the forward side of the turret (typical angle measurement)
      * ALSO, the 0 of this value should coincide with the 0 of the robot, + is ccw
      */
-    private double turretAngle = 0; // rads, dynamic, use a turret object to fetch
+    private double turretAngle = 0; // degs, dynamic, use a turret object to fetch
     private String limeLightName = "limelight-rogue";
-    public double calculatedErrorAngle = 0;
+    public double calculatedTargetAngleDegrees = 0;
     private SwerveDrivePoseEstimator m_poseEstimator;
     private Turret turret;
     private Field2d m_field = new Field2d();
@@ -45,22 +45,14 @@ public class Limelight extends SubsystemBase {
         cameraY = turretAxisLeftwardOffset;
         cameraYaw = cameraYawOffset;
 
-
-        LimelightHelpers.setCameraPose_RobotSpace(limeLightName,
-                turretAxisForwardOffset,
-                turretAxisLeftwardOffset,
-                cameraHeightOffset,
-                0,
-                cameraPitchOffset,
-                cameraYawOffset);
-
         SmartDashboard.putData("Field", m_field);
     }
 
     private void calculateCameraTurretPosition() {
         turretAngle = turret.getPosition();
-        double turretRelativeCameraX =  Math.sin(turretAngle) * cameraAxisDiameter/2; // + is forward
-        double turretRelativeCameraY = -Math.cos(turretAngle) * cameraAxisDiameter/2; // + is leftward
+        double turretAngleRads = Math.toRadians(turretAngle);
+        double turretRelativeCameraX =  Math.sin(turretAngleRads) * (cameraAxisDiameter/2); // + is forward
+        double turretRelativeCameraY = -Math.cos(turretAngleRads) * (cameraAxisDiameter/2); // + is leftward
         double turretRelativeCameraYaw = turretAngle; // + is ccw, name is redundant
 
         cameraX = turretRelativeCameraX + turretAxisForwardOffset;
@@ -68,21 +60,21 @@ public class Limelight extends SubsystemBase {
         cameraYaw = turretRelativeCameraYaw;
     }
 
-    private double turretAngleToTarget(Pose2d target, Pose2d currentPose){
+    private double turretAngleToTargetDegrees(Pose2d target, Pose2d currentPose){
 
         currentPose = currentPose
                 // turret axis-bot center offset
                 .plus(new Transform2d(turretAxisForwardOffset, turretAxisLeftwardOffset, new Rotation2d()));
 
 
-        Pose2d targetTanComponent = new Pose2d(
+        Pose2d targetDistanceComponents = new Pose2d(
                 target.getX() - currentPose.getX(),
                 target.getY() - currentPose.getY(),
                 new Rotation2d()
         );
 
         Rotation2d targetHeading = new Rotation2d(
-                Math.atan2(targetTanComponent.getY(), targetTanComponent.getX())
+                Math.atan2(targetDistanceComponents.getY(), targetDistanceComponents.getX())
         );
 
         return targetHeading.minus(currentPose.getRotation()).getDegrees();
@@ -92,6 +84,11 @@ public class Limelight extends SubsystemBase {
     @Override
     public void periodic() {
         try {
+            if (m_poseEstimator == null || turret == null) {
+                SmartDashboard.putString("Limelight Status", "Waiting for Subsystems");
+                return;
+            }
+
             calculateCameraTurretPosition();
             LimelightHelpers.setCameraPose_RobotSpace(limeLightName,
                     cameraX,
@@ -104,17 +101,22 @@ public class Limelight extends SubsystemBase {
 
             LimelightHelpers.PoseEstimate measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(limeLightName);
             if (measurement.tagCount >= 2) {
-                m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 9999999));
+                m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, Math.toRadians(3)));
                 m_poseEstimator.addVisionMeasurement(
                     measurement.pose,
                     measurement.timestampSeconds);
             }
 
             latestPose = m_poseEstimator.getEstimatedPosition();
+            if (latestPose == null) {
+                SmartDashboard.putString("Limelight Status", "Estimator No Pose");
+                return;
+            }
 
-            calculatedErrorAngle = turretAngleToTarget(new Pose2d(5,10, new Rotation2d()), latestPose);
-            SmartDashboard.putNumber("Calculated Angle: ", calculatedErrorAngle);
+            calculatedTargetAngleDegrees = turretAngleToTargetDegrees(new Pose2d(4.625594,4.034536, new Rotation2d()), latestPose);
+            SmartDashboard.putNumber("Calculated Angle: ", calculatedTargetAngleDegrees);
             m_field.setRobotPose(latestPose);
+            SmartDashboard.putString("Limelight Status", "OK");
         } catch (Exception exception){
             SmartDashboard.putString("Limelight Exception", exception.getMessage());
         }

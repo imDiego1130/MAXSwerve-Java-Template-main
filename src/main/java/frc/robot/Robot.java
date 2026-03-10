@@ -31,6 +31,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     m_robotContainer.m_robotDrive.initialize();
+    m_robotContainer.initLimelight();
   }
 
   /**
