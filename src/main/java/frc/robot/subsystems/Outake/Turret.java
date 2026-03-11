@@ -21,7 +21,8 @@ public class Turret extends SubsystemBase {
     // + in position is cw rotation
     private final double MIN_ANGLE = -90;
     private final double MAX_ANGLE = 90;
-    public boolean isMaintainingHeading = false;
+    private boolean isMaintainingHeading = false;
+    public boolean isTrackingPosition = false;
     private double trackAroundHeading = 0;
     private double target = 0;
     private AHRS m_gyro;
@@ -92,7 +93,8 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Turret Position (Degrees): ", turretEncoder.getPosition());
+        SmartDashboard.putNumber("Turret Position (Degrees) ", turretEncoder.getPosition());
+        SmartDashboard.putBoolean("Turret Tracking Target", isTrackingPosition);
     }
 
 }

@@ -90,13 +90,13 @@ public class RobotContainer {
 
         m_turret.setDefaultCommand(
                 new RunCommand(() -> {
-                    if (m_turret.isMaintainingHeading) {
+                    if (m_turret.isTrackingPosition) {
                         m_turret.turnToPosition(m_limelight.calculatedTargetAngleDegrees);
                     } else {
-                        double x = MathUtil.applyDeadband(m_operatorController.getLeftX(), 0.05);
-                        double y = MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.05);
+                        double x = MathUtil.applyDeadband(m_operatorController.getLeftX(), 0.1);
+                        double y = MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.1);
 
-                        if (Math.abs(x) < 0.05 && Math.abs(y) < 0.05) {
+                        if (Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
                                 m_turret.turnToPosition();
                         } else {
                                 double angle = Math.toDegrees(Math.atan2(y,x)) - 90;
@@ -113,8 +113,7 @@ public class RobotContainer {
         m_shooter.setDefaultCommand(
                 new RunCommand(() -> {
                     double y = MathUtil.applyDeadband(-m_operatorController.getRightY(), 0.1);
-                    double vel = m_shooter.getTargetVelocity();
-                    if (vel > 0) {
+                    if (!m_shooter.isturnedOff) {
                         m_shooter.spinWithVelocity(m_shooter.getTargetVelocity()+y);
                     } else {
                         m_shooter.spinWithVelocity(0);
@@ -152,15 +151,13 @@ public class RobotContainer {
                         () -> m_robotDrive.zeroHeading(),
                         m_robotDrive));
                         
-
+            
         // Triggers
-         
         Trigger rightTrigger = new Trigger(() -> m_driverController.getRightTriggerAxis() > 0.2);
         rightTrigger.whileTrue(
                 new RunCommand(() -> m_intakeRollers.intakeIn(), m_intakeRollers)
         );
         
-
         Trigger leftTrigger = new Trigger(() -> m_driverController.getLeftTriggerAxis() > 0.2);
         leftTrigger.whileTrue(
                 new RunCommand(() -> m_intakeRollers.intakeOut(), m_intakeRollers)
@@ -177,27 +174,20 @@ public class RobotContainer {
                 new InstantCommand(() -> m_intakePivot.raise(), m_intakePivot)
         );
 
-        // OPERATOR CONTROLLER
+        // OPERATOR CONTROLLER ---
 
         // Spindexer
         Trigger leftTrigger2 = new Trigger(() -> m_operatorController.getLeftTriggerAxis() > 0.03);
         leftTrigger2.whileTrue(
                 new RunCommand(() -> {
-                        if (m_feeder.getRPM() <= -1000) {
+                        if (Math.abs(m_feeder.getRPM()) >= 1000) {
                                 m_spindexer.spinClockwise(m_operatorController.getLeftTriggerAxis() );
                         }
                         m_feeder.feedIn();
                 }, m_spindexer, m_feeder)
         );
 
-        /* 
-        Trigger rightTrigger2 = new Trigger(() -> m_operatorController.getRightTriggerAxis() > 0.03);
-        rightTrigger2.whileTrue(
-                new RunCommand(() -> m_intakeRollers.intakeIn(), m_intakeRollers)
-        );
-        */
-
-        // Feeder
+        // Stop Button
         Trigger buttonB = new Trigger(() -> m_operatorController.getBButton());
         buttonB.onTrue(
                 new RunCommand(() -> {
@@ -207,23 +197,16 @@ public class RobotContainer {
                 }, m_shooter)
         );
 
-        // Turret
+        // Turret tracking toggle
         Trigger buttonX = new Trigger(() -> m_operatorController.getXButtonPressed());
         buttonX.onTrue(
-                new InstantCommand(() -> m_turret.isMaintainingHeading = !m_turret.isMaintainingHeading, m_turret)
+                new InstantCommand(() -> m_turret.isTrackingPosition = !m_turret.isTrackingPosition, m_turret)
         );
 
+        // Shooter power toggle
         Trigger buttonY = new Trigger(() -> m_operatorController.getYButtonPressed());
         buttonY.onTrue(
-                new RunCommand(() -> {
-                        if (m_shooter.getTurnOff()) {
-                                m_shooter.turnOff(false);
-                                m_shooter.stop();
-                        } else {
-                                m_shooter.turnOff(true);
-                                m_shooter.spinWithVelocity(5.5);
-                        }
-                }, m_shooter)
+                new InstantCommand(() -> m_shooter.isturnedOff = !m_shooter.isturnedOff, m_shooter)
         );
         
     }

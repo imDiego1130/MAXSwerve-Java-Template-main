@@ -1,0 +1,43 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "CameraPublisher": {
+        "limelight-rogue": {
+          "open": true
+        }
+      },
+      "SmartDashboard": {
+        "open": true
+      },
+      "limelight-rogue": {
+        "double[]##v_/limelight-rogue/botpose_orb_wpiblue": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Field": "Field2d"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "bottom": 1914,
+        "height": 8.069275856018066,
+        "left": 245,
+        "right": 3942,
+        "top": 118,
+        "width": 16.54119300842285,
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)"
+  }
+}

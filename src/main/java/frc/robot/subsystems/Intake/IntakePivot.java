@@ -21,8 +21,8 @@ public class IntakePivot extends SubsystemBase {
 
     // Preset Positions
     // in deg
-    private static final double UP_POSITION = 30;
-    private static final double DOWN_POSITION = 90;
+    private static final double UP_POSITION = 20;
+    private static final double DOWN_POSITION = 50;
 
     @SuppressWarnings("removal")
     public IntakePivot() {

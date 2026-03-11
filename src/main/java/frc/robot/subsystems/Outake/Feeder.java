@@ -4,7 +4,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 
@@ -18,7 +17,7 @@ public class Feeder extends SubsystemBase {
         feeder = new SparkMax(21, MotorType.kBrushless);
 
         feeder.configure(
-                Configs.Outake.feedgerConfig,
+                Configs.Outake.feederConfig,
                 SparkMax.ResetMode.kResetSafeParameters,
                 SparkMax.PersistMode.kPersistParameters
         );
@@ -31,11 +30,11 @@ public class Feeder extends SubsystemBase {
     }
 
     public void feedIn() {
-        feeder.set(-1);
+        feeder.set(1);
     }
 
     public void feedOut() {
-        feeder.set(1);
+        feeder.set(-1);
     }
 
     public void stop() {

@@ -36,7 +36,7 @@ public class Limelight extends SubsystemBase {
     private Field2d m_field = new Field2d();
 
     private Pose2d latestPose;
-    @SuppressWarnings("removal")
+    
     public Limelight(SwerveDrivePoseEstimator poseEstimator, Turret turretModule) {
         m_poseEstimator = poseEstimator;
         turret = turretModule;
@@ -44,6 +44,8 @@ public class Limelight extends SubsystemBase {
         cameraX = turretAxisForwardOffset;
         cameraY = turretAxisLeftwardOffset;
         cameraYaw = cameraYawOffset;
+
+        LimelightHelpers.setPipelineIndex(limeLightName, 1);
 
         SmartDashboard.putData("Field", m_field);
     }
@@ -99,7 +101,9 @@ public class Limelight extends SubsystemBase {
                     cameraYaw);
 
 
+            LimelightHelpers.getBotPose2d_wpiBlue(limeLightName);
             LimelightHelpers.PoseEstimate measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(limeLightName);
+            SmartDashboard.putNumber("Targets Detected", measurement.tagCount);
             if (measurement.tagCount >= 2) {
                 m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, Math.toRadians(3)));
                 m_poseEstimator.addVisionMeasurement(

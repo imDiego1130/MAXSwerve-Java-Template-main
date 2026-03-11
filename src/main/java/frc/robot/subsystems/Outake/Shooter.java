@@ -17,7 +17,7 @@ public class Shooter extends SubsystemBase {
     private final RelativeEncoder shooterEncoder;
     private final SparkClosedLoopController shooterPID;
     private double targetVelocity = 0;
-    private boolean turnOff = false;
+    public boolean isturnedOff = false;
     // METERS (velocity in METERS/SEC)
     @SuppressWarnings("removal")
     public Shooter() {
@@ -61,17 +61,9 @@ public class Shooter extends SubsystemBase {
         return targetVelocity;
     }
 
-    public boolean getTurnOff(){
-        return turnOff;
-    }
-
-    public void turnOff(boolean bool){
-        turnOff = bool;
-    }
-
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Shooter Vel (M/s): ", shooterEncoder.getVelocity());
+        SmartDashboard.putNumber("Shooter Vel (M/s) ", shooterEncoder.getVelocity());
     }
 
 }

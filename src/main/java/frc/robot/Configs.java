@@ -120,7 +120,7 @@ public final class Configs {
 
   public static final class Outake {
     public static final SparkMaxConfig shooterConfig = new SparkMaxConfig();
-    public static final SparkMaxConfig feedgerConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig feederConfig = new SparkMaxConfig();
     public static final SparkMaxConfig turretConfig = new SparkMaxConfig();
 
     static {
@@ -142,7 +142,7 @@ public final class Configs {
               .smartCurrentLimit(30);
 
       
-      feedgerConfig
+      feederConfig
               .idleMode(IdleMode.kBrake)
               .smartCurrentLimit(30);
 
