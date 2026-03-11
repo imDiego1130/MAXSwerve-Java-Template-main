@@ -101,9 +101,12 @@ public class Limelight extends SubsystemBase {
                     cameraYaw);
 
 
-            LimelightHelpers.getBotPose2d_wpiBlue(limeLightName);
+            Pose2d pose = LimelightHelpers.getBotPose2d_wpiBlue(limeLightName);
+            double tagCount2 = LimelightHelpers.getLatestResults(limeLightName).targets_Fiducials.length;
             LimelightHelpers.PoseEstimate measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(limeLightName);
             SmartDashboard.putNumber("Targets Detected", measurement.tagCount);
+            SmartDashboard.putNumber("Targets Detected2", tagCount2);
+            SmartDashboard.putNumberArray("Position Detected", pose.toMatrix().getData());
             if (measurement.tagCount >= 2) {
                 m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, Math.toRadians(3)));
                 m_poseEstimator.addVisionMeasurement(
