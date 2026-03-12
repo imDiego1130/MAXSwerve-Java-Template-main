@@ -38,7 +38,7 @@ public class Spindexer extends SubsystemBase {
 
     public void spinCounterClockwise(double power) {
         power = Math.abs(power);
-        power = Math.min(power, 1.0);
+        power = Math.min(power, 0.3);
         spindexer.set(power);
     }
 

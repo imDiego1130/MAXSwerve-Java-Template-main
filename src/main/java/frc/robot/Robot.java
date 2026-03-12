@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -46,6 +47,19 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    if (DriverStation.getAlliance().isPresent()) {
+      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+
+        if (m_robotContainer != null){
+          m_robotContainer.configureByColor("red");
+        }
+      } else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+
+        if (m_robotContainer != null){
+          m_robotContainer.configureByColor("blue");
+        }
+      }
+    }
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

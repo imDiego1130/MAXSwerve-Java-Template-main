@@ -111,31 +111,36 @@ public class RobotContainer {
                 new RunCommand(() -> {
                     double y = 0.5*MathUtil.applyDeadband(-m_operatorController.getRightY(), 0.1);
                     if (!m_shooter.isturnedOff) {
-                        m_shooter.spinWithVelocity(m_shooter.getTargetVelocity()+y);
+                        if (!m_shooter.isAutoAdjusting) {
+                            double setVelocity = m_shooter.getTargetVelocity() + y;
+
+                            if (setVelocity > 0) {
+                                m_shooter.spinWithVelocity(setVelocity);
+                            } else {
+                                m_shooter.spinWithVelocity(0);
+                            }
+                        } else {
+                            m_shooter.autoAdjustSpeed(m_limelight.distanceToTarget());
+                        }
                     } else {
                         m_shooter.spinWithVelocity(0);
                     }
                         
                 }, m_shooter)
         );
+    }
 
-        /* 
-        m_intakePivot.setDefaultCommand(
-                new RunCommand(() -> {
-                        if (m_operatorController.getLeftBumperButtonPressed()) {
-                                m_intakePivot.raise();
-                        } else if (m_operatorController.getRightBumperButtonPressed()) {
-                                m_intakePivot.lower();
-                        }
-                }, m_intakePivot)
-        );
-        */
-        
-        
+    public void configureByColor(String team){
+        if (team == "red"){
+            // idk get the red goal pose
+            m_limelight.setTargetPose(new Pose2d(4.625594,4.034536, new Rotation2d()));
+        } else  if (team == "blue"){
+            m_limelight.setTargetPose(new Pose2d(4.625594,4.034536, new Rotation2d()));
+        }
     }
 
     public void initLimelight(){
-        m_limelight = new Limelight(m_robotDrive.m_odometry, m_turret);
+        m_limelight = new Limelight(m_robotDrive.m_odometry, m_turret, m_robotDrive.m_gyro, false);
     }
 
     /**
@@ -192,7 +197,10 @@ public class RobotContainer {
                         if (Math.abs(m_feeder.getRPM()) >= 1000) {
                                 m_spindexer.spinClockwise(m_operatorController.getLeftTriggerAxis() );
                         }
-                        m_feeder.feedIn();
+                        if (!m_shooter.isturnedOff && m_shooter.getVelocity() > 5) {
+                            m_feeder.feedIn();
+                        }
+
                 }, m_spindexer, m_feeder)
         );
 
@@ -203,7 +211,10 @@ public class RobotContainer {
                         m_spindexer.stop();
                         m_shooter.stop();
                         m_feeder.stop();
-                }, m_shooter)
+                        m_intakePivot.stop();
+                        m_intakeRollers.stop();
+                        m_turret.stop();
+                }, m_spindexer, m_shooter, m_feeder, m_intakePivot, m_intakeRollers, m_turret)
         );
 
         // Turret tracking toggle
@@ -215,7 +226,29 @@ public class RobotContainer {
         // Shooter power toggle
         Trigger buttonY = new Trigger(() -> m_operatorController.getYButtonPressed());
         buttonY.onTrue(
+                new InstantCommand(() -> {
+                    m_shooter.isturnedOff = !m_shooter.isturnedOff;
+                    if (!m_shooter.isturnedOff) {
+                        // set default spinning speed to 24 m/s
+                        m_shooter.spinWithVelocity(24);
+                    }
+                }, m_shooter)
+        );
+
+        // Shooter-Speed Control Toggle
+        Trigger buttonA = new Trigger(() -> m_operatorController.getAButtonPressed());
+        buttonA.onTrue(
                 new InstantCommand(() -> m_shooter.isturnedOff = !m_shooter.isturnedOff, m_shooter)
+        );
+
+        // Anti-Jam reverse trigger
+        Trigger rightTrigger2 = new Trigger(()  -> m_operatorController.getRightTriggerAxis() > 0.2);
+        rightTrigger2.whileTrue(
+                new RunCommand(() -> {
+                    if (Math.abs(m_feeder.getRPM()) >= 1000) {
+                        m_spindexer.spinCounterClockwise(m_operatorController.getRightTriggerAxis() );
+                    }
+                }, m_spindexer, m_feeder)
         );
         
     }

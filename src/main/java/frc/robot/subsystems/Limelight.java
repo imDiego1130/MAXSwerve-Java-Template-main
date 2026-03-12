@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.studica.frc.AHRS;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,7 +24,7 @@ public class Limelight extends SubsystemBase {
     private double cameraY; // computed, + is left
     private double cameraYaw; // computed, + is ccw
 
-    private double cameraAxisDiameter = 0.225; // meters, how wide the circle the camera's path of motion is
+    private final double cameraAxisDiameter = 0.225; // meters, how wide the circle the camera's path of motion is
     /**
      * should be the angle that faces the CAMERA, NOT the angle that faces the forward side of the turret (typical angle measurement)
      * ALSO, the 0 of this value should coincide with the 0 of the robot, + is ccw
@@ -33,14 +34,19 @@ public class Limelight extends SubsystemBase {
     public double calculatedTargetAngleDegrees = 0;
     private SwerveDrivePoseEstimator m_poseEstimator;
     private Turret turret;
+    private AHRS m_gyro;
     private Field2d m_field = new Field2d();
+    // automatically set to Blue Goal
     private Pose2d targetPose = new Pose2d(4.625594,4.034536, new Rotation2d());
+    private final boolean setToScanWithMT2;
 
     private Pose2d latestPose = new Pose2d();
     
-    public Limelight(SwerveDrivePoseEstimator poseEstimator, Turret turretModule) {
+    public Limelight(SwerveDrivePoseEstimator poseEstimator, Turret turretModule, AHRS gyroModule, boolean scanWithMT2) {
         m_poseEstimator = poseEstimator;
         turret = turretModule;
+        m_gyro = gyroModule;
+        setToScanWithMT2 = scanWithMT2;
 
         cameraX = turretAxisForwardOffset;
         cameraY = turretAxisLeftwardOffset;
@@ -54,8 +60,8 @@ public class Limelight extends SubsystemBase {
     private void calculateCameraTurretPosition() {
         turretAngle = turret.getPosition();
         double turretAngleRads = Math.toRadians(turretAngle);
-        double turretRelativeCameraX =  Math.sin(turretAngleRads) * (cameraAxisDiameter/2); // + is forward
-        double turretRelativeCameraY = -Math.cos(turretAngleRads) * (cameraAxisDiameter/2); // + is leftward
+        double turretRelativeCameraX =  Math.cos(turretAngleRads) * (cameraAxisDiameter/2); // + is forward
+        double turretRelativeCameraY = -Math.sin(turretAngleRads) * (cameraAxisDiameter/2); // + is leftward
         double turretRelativeCameraYaw = turretAngle; // + is ccw, name is redundant
 
         cameraX = turretRelativeCameraX + turretAxisForwardOffset;
@@ -83,10 +89,64 @@ public class Limelight extends SubsystemBase {
         return targetHeading.minus(currentPose.getRotation()).getDegrees();
     }
 
-    private double distanceToTarget(){
+    public double distanceToTarget(){
         double x = targetPose.getX() - latestPose.getX();
         double y = targetPose.getY() - latestPose.getY();
-        return (Math.sqrt(Math.pow(x, 2)+ Math.pow(y, 2)));
+        return (Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)));
+    }
+
+    private void scanWithMT1(){
+        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limeLightName);
+        SmartDashboard.putNumber("Targets Detected", mt1.tagCount);
+
+        boolean doRejectUpdate = false;
+        if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
+            if (mt1.rawFiducials[0].ambiguity > .7) {
+                doRejectUpdate = true;
+            }
+            if (mt1.rawFiducials[0].distToCamera > 3) {
+                doRejectUpdate = true;
+            }
+        }
+
+        if (mt1.tagCount == 0) {
+            doRejectUpdate = true;
+        }
+
+        if (!doRejectUpdate && mt1.tagCount >= 2) {
+            m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, Math.toRadians(8)));
+            m_poseEstimator.addVisionMeasurement(
+                    mt1.pose,
+                    mt1.timestampSeconds);
+        }
+    }
+
+    private void scanWithMT2(){
+        LimelightHelpers.SetRobotOrientation(limeLightName, m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightName);
+        SmartDashboard.putNumber("Targets Detected", mt2.tagCount);
+
+        boolean doRejectUpdate = false;
+        // if our angular velocity is greater than 360 degrees per second, ignore vision updates
+        if(Math.abs(m_gyro.getRate()) > 360)
+        {
+            doRejectUpdate = true;
+        }
+        if(mt2.tagCount == 0)
+        {
+            doRejectUpdate = true;
+        }
+        if(!doRejectUpdate)
+        {
+            m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 9999999));
+            m_poseEstimator.addVisionMeasurement(
+                    mt2.pose,
+                    mt2.timestampSeconds);
+        }
+    }
+
+    public void setTargetPose(Pose2d pose){
+        targetPose = pose;
     }
 
 
@@ -108,17 +168,10 @@ public class Limelight extends SubsystemBase {
                     cameraYaw);
 
 
-            Pose2d pose = LimelightHelpers.getBotPose2d_wpiBlue(limeLightName);
-            double tagCount2 = LimelightHelpers.getLatestResults(limeLightName).targets_Fiducials.length;
-            LimelightHelpers.PoseEstimate measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(limeLightName);
-            SmartDashboard.putNumber("Targets Detected", measurement.tagCount);
-            SmartDashboard.putNumber("Targets Detected2", tagCount2);
-            SmartDashboard.putNumberArray("Position Detected", pose.toMatrix().getData());
-            if (measurement.tagCount >= 2) {
-                m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, Math.toRadians(8)));
-                m_poseEstimator.addVisionMeasurement(
-                    measurement.pose,
-                    measurement.timestampSeconds);
+            if (setToScanWithMT2) {
+                scanWithMT2();
+            } else {
+                scanWithMT1();
             }
 
             latestPose = m_poseEstimator.getEstimatedPosition();
@@ -127,7 +180,7 @@ public class Limelight extends SubsystemBase {
                 return;
             }
 
-            calculatedTargetAngleDegrees = turretAngleToTargetDegrees(new Pose2d(4.625594,4.034536, new Rotation2d()), latestPose);
+            calculatedTargetAngleDegrees = turretAngleToTargetDegrees(targetPose, latestPose);
             SmartDashboard.putNumber("Calculated Angle: ", calculatedTargetAngleDegrees);
             m_field.setRobotPose(latestPose);
             SmartDashboard.putString("Limelight Status", "OK");
