@@ -93,16 +93,13 @@ public class RobotContainer {
                     if (m_turret.isTrackingPosition) {
                         m_turret.turnToPosition(m_limelight.calculatedTargetAngleDegrees);
                     } else {
-                        double x = MathUtil.applyDeadband(m_operatorController.getLeftX(), 0.1);
+                        double x = MathUtil.applyDeadband(-m_operatorController.getLeftX(), 0.1);
                         double y = MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.1);
 
                         if (Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
                                 m_turret.turnToPosition();
                         } else {
-                                double angle = Math.toDegrees(Math.atan2(y,x)) - 90;
-                                if (angle < 0){
-                                    angle += 180;
-                                }
+                                double angle = Math.toDegrees(Math.atan2(x,y));
                                 m_turret.turnToPosition(angle);
                         }
                     }
@@ -112,7 +109,7 @@ public class RobotContainer {
          
         m_shooter.setDefaultCommand(
                 new RunCommand(() -> {
-                    double y = MathUtil.applyDeadband(-m_operatorController.getRightY(), 0.1);
+                    double y = 0.5*MathUtil.applyDeadband(-m_operatorController.getRightY(), 0.1);
                     if (!m_shooter.isturnedOff) {
                         m_shooter.spinWithVelocity(m_shooter.getTargetVelocity()+y);
                     } else {
@@ -121,6 +118,18 @@ public class RobotContainer {
                         
                 }, m_shooter)
         );
+
+        /* 
+        m_intakePivot.setDefaultCommand(
+                new RunCommand(() -> {
+                        if (m_operatorController.getLeftBumperButtonPressed()) {
+                                m_intakePivot.raise();
+                        } else if (m_operatorController.getRightBumperButtonPressed()) {
+                                m_intakePivot.lower();
+                        }
+                }, m_intakePivot)
+        );
+        */
         
         
     }
@@ -167,11 +176,11 @@ public class RobotContainer {
         // Bumpers
         Trigger leftBumper = new Trigger(() -> m_driverController.getLeftBumperButton());
         leftBumper.onTrue(
-                new InstantCommand(() -> m_intakePivot.lower(), m_intakePivot)
+                new InstantCommand(() -> m_intakePivot.raise(), m_intakePivot)
         );
         Trigger rightBumper = new Trigger(() -> m_driverController.getRightBumperButton());
         rightBumper.onTrue(
-                new InstantCommand(() -> m_intakePivot.raise(), m_intakePivot)
+                new InstantCommand(() -> m_intakePivot.lower(), m_intakePivot)
         );
 
         // OPERATOR CONTROLLER ---

@@ -17,7 +17,7 @@ public class Limelight extends SubsystemBase {
     private final double turretAxisForwardOffset = -0.16; // meters, forward from robot center
     private final double turretAxisLeftwardOffset = 0.15; // meters, left from robot center
     private final double cameraHeightOffset = 0.59; // meters, up from robot center
-    private final double cameraPitchOffset = 20; // degrees, following right hand rule
+    private final double cameraPitchOffset = 10; // degrees, following right hand rule
     private final double cameraYawOffset = -90; // degrees, following right hand rule
     private double cameraX; // computed, + is forward
     private double cameraY; // computed, + is left
@@ -34,8 +34,9 @@ public class Limelight extends SubsystemBase {
     private SwerveDrivePoseEstimator m_poseEstimator;
     private Turret turret;
     private Field2d m_field = new Field2d();
+    private Pose2d targetPose = new Pose2d(4.625594,4.034536, new Rotation2d());
 
-    private Pose2d latestPose;
+    private Pose2d latestPose = new Pose2d();
     
     public Limelight(SwerveDrivePoseEstimator poseEstimator, Turret turretModule) {
         m_poseEstimator = poseEstimator;
@@ -82,6 +83,12 @@ public class Limelight extends SubsystemBase {
         return targetHeading.minus(currentPose.getRotation()).getDegrees();
     }
 
+    private double distanceToTarget(){
+        double x = targetPose.getX() - latestPose.getX();
+        double y = targetPose.getY() - latestPose.getY();
+        return (Math.sqrt(Math.pow(x, 2)+ Math.pow(y, 2)));
+    }
+
 
     @Override
     public void periodic() {
@@ -108,7 +115,7 @@ public class Limelight extends SubsystemBase {
             SmartDashboard.putNumber("Targets Detected2", tagCount2);
             SmartDashboard.putNumberArray("Position Detected", pose.toMatrix().getData());
             if (measurement.tagCount >= 2) {
-                m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, Math.toRadians(3)));
+                m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, Math.toRadians(8)));
                 m_poseEstimator.addVisionMeasurement(
                     measurement.pose,
                     measurement.timestampSeconds);
@@ -124,6 +131,7 @@ public class Limelight extends SubsystemBase {
             SmartDashboard.putNumber("Calculated Angle: ", calculatedTargetAngleDegrees);
             m_field.setRobotPose(latestPose);
             SmartDashboard.putString("Limelight Status", "OK");
+            SmartDashboard.putNumber("Distance To Target ", distanceToTarget());
         } catch (Exception exception){
             SmartDashboard.putString("Limelight Exception", exception.getMessage());
         }

@@ -102,8 +102,8 @@ public final class Configs {
 
         pivotConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(3.0, 0.0, 0.0)
-            .outputRange(-1.0, 1.0);
+            .pid(0.1, 0.0, 0.0)
+            .outputRange(-0.6, 0.6);
     }
   }
   public static final class Spindexer {
@@ -156,12 +156,12 @@ public final class Configs {
 
       shooterConfig.closedLoop
               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-              .pid(0.1, 0.0, 0)
+              .pid(0.11, 0.0, 0)
               .outputRange(-1.0, 1.0);
 
       turretConfig.closedLoop
               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-              .pid(0.01, 0.0, 0)
+              .pid(0.005, 0.0, 0)
               .outputRange(-1.0, 1.0);
 
       shooterConfig.closedLoop.feedForward

@@ -21,8 +21,8 @@ public class IntakePivot extends SubsystemBase {
 
     // Preset Positions
     // in deg
-    private static final double UP_POSITION = 20;
-    private static final double DOWN_POSITION = 50;
+    private static final double UP_POSITION = 60;
+    private static final double DOWN_POSITION = 100;
 
     @SuppressWarnings("removal")
     public IntakePivot() {
@@ -66,7 +66,6 @@ public class IntakePivot extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Pivot Deg: ", getPivotPosition());
-        SmartDashboard.putNumber("Pivot Target: ", pivotPID.getSetpoint());
     }
 
 }
