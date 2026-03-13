@@ -23,12 +23,6 @@
                       "data": {
                         "name": "shooterToVelocity"
                       }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "bootIntake"
-                      }
                     }
                   ]
                 }

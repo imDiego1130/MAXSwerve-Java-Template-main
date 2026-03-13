@@ -156,7 +156,7 @@ public final class Configs {
 
       shooterConfig.closedLoop
               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-              .pid(0.105, 0.0, 0.001)
+              .pid(0.105, 0.0, 0)
               .outputRange(-1.0, 1.0);
 
       turretConfig.closedLoop

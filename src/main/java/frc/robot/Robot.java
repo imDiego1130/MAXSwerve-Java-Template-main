@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
 
     m_robotContainer.setUpAutoChooser();
 
-    CameraServer.startAutomaticCapture();
+    //CameraServer.startAutomaticCapture();
     //LimelightHelpers.setupPortForwardingUSB(0);
   }
 

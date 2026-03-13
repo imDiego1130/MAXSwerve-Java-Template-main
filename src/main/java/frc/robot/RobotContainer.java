@@ -17,6 +17,8 @@ import frc.robot.subsystems.Outake.Turret;
  
 import frc.robot.subsystems.Outake.Shooter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -143,19 +145,20 @@ public class RobotContainer {
 
     public void setUpAutoChooser(){
         autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("Auto Mode", autoChooser);
     }
 
     public void configureByColor(String team){
         if (team == "red"){
             // idk get the red goal pose
-            m_limelight.setTargetPose(new Pose2d(4.625594,4.034536, new Rotation2d()));
+            m_limelight.setTargetPose(new Pose2d(4.625594+3.6449,4.034536, new Rotation2d()));
         } else  if (team == "blue"){
             m_limelight.setTargetPose(new Pose2d(4.625594,4.034536, new Rotation2d()));
         }
     }
 
     public void initLimelight(){
-        m_limelight = new Limelight(m_robotDrive.m_odometry, m_turret, m_robotDrive.m_gyro, false);
+        m_limelight = new Limelight(m_robotDrive.m_odometry, m_turret, m_robotDrive.m_gyro, true);
     }
 
     /**
@@ -206,7 +209,7 @@ public class RobotContainer {
         // OPERATOR CONTROLLER ---
 
         // Spindexer
-        Trigger leftTrigger2 = new Trigger(() -> m_operatorController.getLeftTriggerAxis() > 0.03);
+        Trigger leftTrigger2 = new Trigger(() -> m_operatorController.getLeftTriggerAxis() > 0.1);
         leftTrigger2.whileTrue(
                 new RunCommand(() -> {
                         if (Math.abs(m_feeder.getRPM()) >= 1000) {
@@ -243,9 +246,15 @@ public class RobotContainer {
         buttonY.onTrue(
                 new InstantCommand(() -> {
                     m_shooter.isturnedOff = !m_shooter.isturnedOff;
+                }, m_shooter)
+        );
+
+        Trigger leftBumper2 = new Trigger(() -> m_operatorController.getLeftBumperButtonPressed());
+        leftBumper2.onTrue(
+            new RunCommand(
+                () -> {
                     if (!m_shooter.isturnedOff) {
-                        // set default spinning speed to 24 m/s
-                        m_shooter.spinWithVelocity(24);
+                        m_shooter.spinWithVelocity(7.7);
                     }
                 }, m_shooter)
         );
@@ -253,7 +262,7 @@ public class RobotContainer {
         // Shooter-Speed Control Toggle
         Trigger buttonA = new Trigger(() -> m_operatorController.getAButtonPressed());
         buttonA.onTrue(
-                new InstantCommand(() -> m_shooter.isturnedOff = !m_shooter.isturnedOff, m_shooter)
+                new InstantCommand(() -> m_shooter.isAutoAdjusting = !m_shooter.isAutoAdjusting, m_shooter)
         );
 
         // Anti-Jam reverse trigger

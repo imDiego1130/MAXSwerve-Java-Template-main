@@ -116,8 +116,8 @@ public class DriveSubsystem extends SubsystemBase {
       this::getChassisSpeeds,
       (speeds, feedforwards) -> drive(speeds),
       new PPHolonomicDriveController(
-        new PIDConstants(2.0, 0.0, 0.0),
-        new PIDConstants(2.0, 0.0, 0.0)
+        new PIDConstants(4.0, 0.0, 0.0),
+        new PIDConstants(4.0, 0.0, 0.0)
       ),
       config,
       () -> {

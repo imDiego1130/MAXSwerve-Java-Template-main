@@ -20,7 +20,7 @@ public class Shooter extends SubsystemBase {
     private final RelativeEncoder shooterEncoder;
     private final SparkClosedLoopController shooterPID;
     private double targetVelocity = 0;
-    public boolean isturnedOff = false;
+    public boolean isturnedOff = true;
     public boolean isAutoAdjusting = false;
     // plotted points
     private final ArrayList<double[]> dataPoints = new ArrayList<>(Arrays.asList(
@@ -94,12 +94,8 @@ public class Shooter extends SubsystemBase {
         return yf + (distance - xf)*mf;
     }
 
-    public void spinWithPower(double power) {
-        shooter.set(power);
-    }
-
     public void spinWithVelocity(double velocity) {
-        targetVelocity = velocity;
+        targetVelocity = Math.min(velocity, 7.7);
         shooterPID.setSetpoint(targetVelocity, SparkMax.ControlType.kVelocity);
     }
 
@@ -120,14 +116,18 @@ public class Shooter extends SubsystemBase {
     }
 
     public void autoAdjustSpeed(double distance){
-        spinWithVelocity(getRegressionValue(distance, 1));
+        if (isAutoAdjusting) {
+            spinWithVelocity(getRegressionValue(distance, 1));
+        }
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Shooter Vel metersPsec ", getVelocity());
+        SmartDashboard.putNumber("Target Velocity", targetVelocity);
         SmartDashboard.putBoolean("Shooter Auto Adjusting", isAutoAdjusting);
         SmartDashboard.putBoolean("Shooter Toggled On", !isturnedOff);
+        SmartDashboard.putNumber("Setpoint", shooterPID.getMAXMotionSetpointVelocity());
     }
 
 }
