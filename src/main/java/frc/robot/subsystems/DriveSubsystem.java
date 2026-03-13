@@ -53,7 +53,30 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-
+    RobotConfig config = new RobotConfig(
+            43.5449,
+            3.35,
+            new ModuleConfig(
+                    ModuleConstants.kWheelDiameterMeters, ModuleConstants.kDriveWheelFreeVelocityMps, 1.0, DCMotor.getNEO(1), 50.0, 1),
+            DriveConstants.kTrackWidth);
+    AutoBuilder.configure(
+            this::getPose,
+            this::resetPose,
+            this::getChassisSpeeds,
+            (speeds, feedforwards) -> drive(speeds),
+            new PPHolonomicDriveController(
+                    new PIDConstants(2.0, 0.0, 0.0),
+                    new PIDConstants(2.0, 0.0, 0.0)
+            ),
+            config,
+            () -> {
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this);
 
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
@@ -103,31 +126,9 @@ public class DriveSubsystem extends SubsystemBase {
             },
             new Pose2d());
 
-    RobotConfig config = new RobotConfig(
-      43.5449,
-      3.35,
-      new ModuleConfig(
-        ModuleConstants.kWheelDiameterMeters, ModuleConstants.kDriveWheelFreeVelocityMps, 1.0, DCMotor.getNEO(1), 50.0, 1),
-        DriveConstants.kTrackWidth);
 
-    AutoBuilder.configure(
-      this::getPose,
-      this::resetPose,
-      this::getChassisSpeeds,
-      (speeds, feedforwards) -> drive(speeds),
-      new PPHolonomicDriveController(
-        new PIDConstants(2.0, 0.0, 0.0),
-        new PIDConstants(2.0, 0.0, 0.0)
-      ),
-      config,
-      () -> {
-        var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent()) {
-          return alliance.get() == DriverStation.Alliance.Red;
-        } 
-        return false;
-      },
-      this);
+
+
   }
 
   @Override
