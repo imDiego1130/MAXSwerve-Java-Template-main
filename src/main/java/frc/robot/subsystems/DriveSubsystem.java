@@ -14,12 +14,24 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
+import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PPLTVController;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -90,6 +102,32 @@ public class DriveSubsystem extends SubsystemBase {
                     m_rearRight.getPosition()
             },
             new Pose2d());
+
+    RobotConfig config = new RobotConfig(
+      43.5449,
+      3.35,
+      new ModuleConfig(
+        ModuleConstants.kWheelDiameterMeters, ModuleConstants.kDriveWheelFreeVelocityMps, 1.0, DCMotor.getNEO(1), 50.0, 1),
+        DriveConstants.kTrackWidth);
+
+    AutoBuilder.configure(
+      this::getPose,
+      this::resetPose,
+      this::getChassisSpeeds,
+      (speeds, feedforwards) -> drive(speeds),
+      new PPHolonomicDriveController(
+        new PIDConstants(2.0, 0.0, 0.0),
+        new PIDConstants(2.0, 0.0, 0.0)
+      ),
+      config,
+      () -> {
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+          return alliance.get() == DriverStation.Alliance.Red;
+        } 
+        return false;
+      },
+      this);
   }
 
   @Override
@@ -104,11 +142,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
     SmartDashboard.putNumber("Gyro Angle: ", getHeading());
-    SmartDashboard.putNumber("frontLeft  Pos: ", m_frontLeft.getPosition().distanceMeters);
-    SmartDashboard.putNumber("frontRight Pos: ", m_frontRight.getPosition().distanceMeters);
-    SmartDashboard.putNumber("rearLeft   Pos: ", m_rearLeft.getPosition().distanceMeters);
-    SmartDashboard.putNumber("rearRight  Pos: ", m_rearRight.getPosition().distanceMeters);
-    SmartDashboard.putNumberArray("Pose meters (x), (y): ", new double[]{m_odometry.getEstimatedPosition().getX(), m_odometry.getEstimatedPosition().getY()});
+    //SmartDashboard.putNumberArray("Pose meters (x), (y): ", new double[]{m_odometry.getEstimatedPosition().getX(), m_odometry.getEstimatedPosition().getY()});
   }
 
   /**
@@ -119,6 +153,19 @@ public class DriveSubsystem extends SubsystemBase {
   public Pose2d getPose() {
     return m_odometry.getEstimatedPosition();
   }
+
+  public void resetPose(Pose2d pose){
+    m_odometry.resetPose(pose);
+  }
+
+  public ChassisSpeeds getChassisSpeeds(){
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState());
+  }
+  
 
   /**
    * Resets the odometry to the specified pose.
@@ -159,6 +206,15 @@ public class DriveSubsystem extends SubsystemBase {
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    m_frontRight.setDesiredState(swerveModuleStates[1]);
+    m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    m_rearRight.setDesiredState(swerveModuleStates[3]);
+  }
+
+  public void drive(ChassisSpeeds chassisSpeeds){
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);

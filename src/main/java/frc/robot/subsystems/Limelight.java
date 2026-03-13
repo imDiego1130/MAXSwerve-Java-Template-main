@@ -61,7 +61,7 @@ public class Limelight extends SubsystemBase {
         turretAngle = turret.getPosition();
         double turretAngleRads = Math.toRadians(turretAngle);
         double turretRelativeCameraX =  Math.cos(turretAngleRads) * (cameraAxisDiameter/2); // + is forward
-        double turretRelativeCameraY = -Math.sin(turretAngleRads) * (cameraAxisDiameter/2); // + is leftward
+        double turretRelativeCameraY =  Math.sin(turretAngleRads) * (cameraAxisDiameter/2); // + is leftward
         double turretRelativeCameraYaw = turretAngle; // + is ccw, name is redundant
 
         cameraX = turretRelativeCameraX + turretAxisForwardOffset;

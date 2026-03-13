@@ -5,18 +5,10 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Limelight;
@@ -24,14 +16,16 @@ import frc.robot.subsystems.Outake.Feeder;
 import frc.robot.subsystems.Outake.Turret;
  
 import frc.robot.subsystems.Outake.Shooter;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 /* 
 import frc.robot.subsystems.Climber;
 */
 import frc.robot.subsystems.Spindexer;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import java.util.List;
 
 import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Intake.IntakeRollers;
@@ -52,6 +46,7 @@ public class RobotContainer {
     private Turret m_turret;
     private Feeder m_feeder;
     private Limelight m_limelight;
+    private SendableChooser<Command> autoChooser;
     //private Climber m_climber = new Climber();
 
     // The driver's controller
@@ -71,6 +66,22 @@ public class RobotContainer {
         m_turret = new Turret(m_robotDrive.getGyroObject());
         m_shooter = new Shooter();
         
+
+        NamedCommands.registerCommand("turretToPosition", new RunCommand(() -> m_turret.turnToPosition(m_limelight.calculatedTargetAngleDegrees), m_turret));
+        NamedCommands.registerCommand("shooterToVelocity", new RunCommand(() -> m_shooter.autoAdjustSpeed(m_limelight.distanceToTarget())));
+        NamedCommands.registerCommand("bootIntake", new InstantCommand(() -> {
+            m_intakePivot.lower();
+            m_intakeRollers.intakeIn();
+        }, m_intakePivot, m_intakeRollers));
+        NamedCommands.registerCommand("feed", new RunCommand(() -> {
+                        if (Math.abs(m_feeder.getRPM()) >= 1000) {
+                                m_spindexer.spinClockwise(m_operatorController.getLeftTriggerAxis() );
+                        }
+                        if (!m_shooter.isturnedOff && m_shooter.getVelocity() > 5) {
+                            m_feeder.feedIn();
+                        }
+
+                }, m_spindexer, m_feeder));
 
         // Configure the button bindings
         configureButtonBindings();
@@ -128,6 +139,10 @@ public class RobotContainer {
                         
                 }, m_shooter)
         );
+    }
+
+    public void setUpAutoChooser(){
+        autoChooser = AutoBuilder.buildAutoChooser();
     }
 
     public void configureByColor(String team){
@@ -259,6 +274,9 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
+
+        return autoChooser.getSelected();
+        /* 
         // Create config for trajectory
         TrajectoryConfig config = new TrajectoryConfig(
                 AutoConstants.kMaxSpeedMetersPerSecond,
@@ -297,6 +315,7 @@ public class RobotContainer {
 
         // Run path following command, then stop at the end.
         return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
+        */
     }
 
     public IntakeRollers getIntake() {

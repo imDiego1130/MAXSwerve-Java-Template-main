@@ -69,35 +69,29 @@ public class Shooter extends SubsystemBase {
     }
 
     private double getRegressionValue(double distance, int valueIndex){
-        double returnVal = 20.7;
-        double[] slopeList = velocitySlopeList;
-        /*
-        if (valueIndex == 1){
-            returnVal = 1400;
-            slopeList = velocitySlopeList;
-        } else {
-            returnVal = 0.6;
-            slopeList = angleSlopeList;
-        }
-         */
-
-        double velZeroIntercept = dataPoints.get(0)[valueIndex] - (slopeList[0]* dataPoints.get(0)[0]);
-
-        if (distance <= dataPoints.get(0)[0]){
-            returnVal = velZeroIntercept + (distance* slopeList[0]);
-            return returnVal;
+        double[] slopeList;
+        slopeList = velocitySlopeList;
+        
+        double x0 = dataPoints.get(0)[0];
+        if (distance <= x0) {
+            double y0 = dataPoints.get(0)[valueIndex];
+            double m0 = slopeList[0];
+            return y0 + (distance - x0)*m0;
         }
 
-        for (int i = 1; i< slopeList.length; i++){
-            if ((i == slopeList.length-1 && distance >= dataPoints.get(i)[0]) ||
-                    distance > dataPoints.get(i-1)[0] && distance <= dataPoints.get(i)[0]){
-
-                returnVal = dataPoints.get(i)[valueIndex] + (distance- dataPoints.get(i)[0])* slopeList[i];
-                return returnVal;
+        for (int i=0; i < dataPoints.size()-1; i++){
+            double xi = dataPoints.get(i+1)[0];
+            if (distance <= xi) {
+                double yi = dataPoints.get(i)[valueIndex];
+                double mi = slopeList[i];
+                return yi + (distance - dataPoints.get(i)[0])*mi;
             }
         }
 
-        return returnVal;
+        double xf = dataPoints.get(dataPoints.size() -1)[0];
+        double yf = dataPoints.get(dataPoints.size() -1)[valueIndex];
+        double mf = slopeList[dataPoints.size() -2];
+        return yf + (distance - xf)*mf;
     }
 
     public void spinWithPower(double power) {
@@ -132,6 +126,8 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Shooter Vel metersPsec ", getVelocity());
+        SmartDashboard.putBoolean("Shooter Auto Adjusting", isAutoAdjusting);
+        SmartDashboard.putBoolean("Shooter Toggled On", !isturnedOff);
     }
 
 }
