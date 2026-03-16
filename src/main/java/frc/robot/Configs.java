@@ -134,7 +134,7 @@ public final class Configs {
       shooterConfig
               .idleMode(IdleMode.kCoast)
               .inverted(false) // shooter is geared, invert direction (+ direction shoots out)
-              .smartCurrentLimit(50);
+              .smartCurrentLimit(40);
 
       turretConfig
               .idleMode(IdleMode.kBrake)
@@ -156,12 +156,12 @@ public final class Configs {
 
       shooterConfig.closedLoop
               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-              .pid(0.105, 0.0, 0)
+              .pid(0.103, 0.0, 0.0)
               .outputRange(-1.0, 1.0);
 
       turretConfig.closedLoop
               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-              .pid(0.005, 0.0, 0.0001)
+              .pid(0.005, 0.0, 0.0)
               .outputRange(-1.0, 1.0);
 
       shooterConfig.closedLoop.feedForward

@@ -39,7 +39,7 @@ public class IntakePivot extends SubsystemBase {
         pivotEncoder.setPosition(0);
 
         setDefaultCommand(
-                new RunCommand(() -> {}, this)
+                new RunCommand(() -> stop(), this)
         );
     }
 

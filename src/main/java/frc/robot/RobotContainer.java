@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -94,9 +95,9 @@ public class RobotContainer {
                 // Turning is controlled by the X axis of the right stick.
                 new RunCommand(
                         () -> m_robotDrive.drive(
-                                -0.8*MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                                -0.8*MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                                -0.8*MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                                -0.9*MathUtil.applyDeadband(m_driverController.getLeftY(), 0.15),
+                                -0.9*MathUtil.applyDeadband(m_driverController.getLeftX(), 0.15),
+                                -0.7*MathUtil.applyDeadband(m_driverController.getRightX(), 0.15),
                                 false),
                         m_robotDrive));
 
@@ -143,17 +144,17 @@ public class RobotContainer {
         );
     }
 
-    public void setUpAutoChooser(){
+     public void setUpAutoChooser(){
         autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("Auto Mode", autoChooser);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     public void configureByColor(String team){
         if (team == "red"){
             // idk get the red goal pose
-            m_limelight.setTargetPose(new Pose2d(4.625594+3.6449,4.034536, new Rotation2d()));
+            m_limelight.setTargetPose(new Pose2d((4.625594+3.6449) - 0.4,(4.034536 +0.381), new Rotation2d()));
         } else  if (team == "blue"){
-            m_limelight.setTargetPose(new Pose2d(4.625594,4.034536, new Rotation2d()));
+            m_limelight.setTargetPose(new Pose2d((4.625594) + 0.4,(4.034536 +0.381), new Rotation2d()));
         }
     }
 
@@ -197,6 +198,7 @@ public class RobotContainer {
         
 
         // Bumpers
+        /* 
         Trigger leftBumper = new Trigger(() -> m_driverController.getLeftBumperButton());
         leftBumper.onTrue(
                 new InstantCommand(() -> m_intakePivot.raise(), m_intakePivot)
@@ -205,6 +207,7 @@ public class RobotContainer {
         rightBumper.onTrue(
                 new InstantCommand(() -> m_intakePivot.lower(), m_intakePivot)
         );
+        */
 
         // OPERATOR CONTROLLER ---
 
@@ -244,9 +247,7 @@ public class RobotContainer {
         // Shooter power toggle
         Trigger buttonY = new Trigger(() -> m_operatorController.getYButtonPressed());
         buttonY.onTrue(
-                new InstantCommand(() -> {
-                    m_shooter.isturnedOff = !m_shooter.isturnedOff;
-                }, m_shooter)
+                new InstantCommand(() -> m_shooter.isturnedOff = true, m_shooter)
         );
 
         Trigger leftBumper2 = new Trigger(() -> m_operatorController.getLeftBumperButtonPressed());
@@ -254,7 +255,17 @@ public class RobotContainer {
             new RunCommand(
                 () -> {
                     if (!m_shooter.isturnedOff) {
-                        m_shooter.spinWithVelocity(7.7);
+                        m_shooter.targetVelocity = 7.7;
+                    }
+                }, m_shooter)
+        );
+
+        Trigger rightBumper2 = new Trigger(() -> m_operatorController.getRightBumperButtonPressed());
+        rightBumper2.onTrue(
+            new RunCommand(
+                () -> {
+                    if (!m_shooter.isturnedOff) {
+                        m_shooter.targetVelocity = 8.5;
                     }
                 }, m_shooter)
         );
@@ -262,7 +273,7 @@ public class RobotContainer {
         // Shooter-Speed Control Toggle
         Trigger buttonA = new Trigger(() -> m_operatorController.getAButtonPressed());
         buttonA.onTrue(
-                new InstantCommand(() -> m_shooter.isAutoAdjusting = !m_shooter.isAutoAdjusting, m_shooter)
+                new InstantCommand(() -> m_shooter.isturnedOff = false, m_shooter)
         );
 
         // Anti-Jam reverse trigger
