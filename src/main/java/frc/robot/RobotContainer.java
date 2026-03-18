@@ -11,14 +11,15 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.DriveAttachment.DriveSubsystem;
+import frc.robot.subsystems.DriveAttachment.ManualDriveCommand;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Outake.Feeder;
-import frc.robot.subsystems.Outake.Turret;
+import frc.robot.subsystems.Outake.TurretAttachment.ManualTurretCommand;
+import frc.robot.subsystems.Outake.TurretAttachment.Turret;
  
 import frc.robot.subsystems.Outake.Shooter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -57,6 +58,8 @@ public class RobotContainer {
     // The Mechanism Controller
     XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
+    private DriveControl controlCenter = new DriveControl(m_driverController, m_operatorController);
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -66,11 +69,12 @@ public class RobotContainer {
         m_intakePivot = new IntakePivot();
         m_spindexer = new Spindexer();
         m_feeder = new Feeder();
-        m_turret = new Turret(m_robotDrive.getGyroObject());
+        m_turret = new Turret();
         m_shooter = new Shooter();
-        
 
-        NamedCommands.registerCommand("turretToPosition", new RunCommand(() -> m_turret.turnToPosition(m_limelight.calculatedTargetAngleDegrees), m_turret));
+        m_turret.setVisionAngleSupplier(() -> m_limelight.calculatedTargetAngleDegrees);
+
+        NamedCommands.registerCommand("turretToPosition", new RunCommand(() -> m_turret.setTargetPosition(m_limelight.calculatedTargetAngleDegrees), m_turret));
         NamedCommands.registerCommand("shooterToVelocity", new RunCommand(() -> m_shooter.autoAdjustSpeed(m_limelight.distanceToTarget())));
         NamedCommands.registerCommand("bootIntake", new InstantCommand(() -> {
             m_intakePivot.lower();
@@ -91,33 +95,12 @@ public class RobotContainer {
 
         // Configure default commands
         m_robotDrive.setDefaultCommand(
-                // The left stick controls translation of the robot.
-                // Turning is controlled by the X axis of the right stick.
-                new RunCommand(
-                        () -> m_robotDrive.drive(
-                                -0.9*MathUtil.applyDeadband(m_driverController.getLeftY(), 0.15),
-                                -0.9*MathUtil.applyDeadband(m_driverController.getLeftX(), 0.15),
-                                -0.7*MathUtil.applyDeadband(m_driverController.getRightX(), 0.15),
-                                false),
-                        m_robotDrive));
+                new ManualDriveCommand(m_robotDrive, controlCenter)
+        );
 
 
         m_turret.setDefaultCommand(
-                new RunCommand(() -> {
-                    if (m_turret.isTrackingPosition) {
-                        m_turret.turnToPosition(m_limelight.calculatedTargetAngleDegrees);
-                    } else {
-                        double x = MathUtil.applyDeadband(-m_operatorController.getLeftX(), 0.1);
-                        double y = MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.1);
-
-                        if (Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
-                                m_turret.turnToPosition();
-                        } else {
-                                double angle = Math.toDegrees(Math.atan2(x,y));
-                                m_turret.turnToPosition(angle);
-                        }
-                    }
-                }, m_turret)
+                new ManualTurretCommand(m_turret, controlCenter)
         );
 
          
@@ -234,7 +217,7 @@ public class RobotContainer {
                         m_feeder.stop();
                         m_intakePivot.stop();
                         m_intakeRollers.stop();
-                        m_turret.stop();
+                        m_turret.holdCurrentPosition();
                 }, m_spindexer, m_shooter, m_feeder, m_intakePivot, m_intakeRollers, m_turret)
         );
 
