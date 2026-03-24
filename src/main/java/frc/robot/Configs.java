@@ -72,7 +72,9 @@ public final class Configs {
   }
   public static final class Intake {
 
-    public static final SparkMaxConfig rollerConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig globalRollerConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig leaderRollerConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig followerRollerConfig = new SparkMaxConfig();
     public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
     static {
@@ -87,7 +89,7 @@ public final class Configs {
 
 
         // Rollers (open loop)
-        rollerConfig
+        globalRollerConfig
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(40);
 
@@ -104,6 +106,12 @@ public final class Configs {
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(0.1, 0.0, 0.0)
             .outputRange(-0.8, 0.8);
+
+        leaderRollerConfig.apply(globalRollerConfig);
+
+        followerRollerConfig.apply(globalRollerConfig
+                .inverted(true)
+                .follow(Constants.IntakeConstants.leaderRollerCanId));
     }
   }
   public static final class Spindexer {
@@ -119,7 +127,9 @@ public final class Configs {
   }
 
   public static final class Outake {
-    public static final SparkMaxConfig shooterConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig globalShooterConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig leaderShooterConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig followerShooterConfig = new  SparkMaxConfig();
     public static final SparkMaxConfig feederConfig = new SparkMaxConfig();
     public static final SparkMaxConfig turretConfig = new SparkMaxConfig();
 
@@ -131,7 +141,7 @@ public final class Configs {
 
       double shootingVelocityFeedForward =  nominalVoltage / ShooterConstants.kWheelFreeVelocityMps;
 
-      shooterConfig
+      globalShooterConfig
               .idleMode(IdleMode.kCoast)
               .inverted(false) // shooter is geared, invert direction (+ direction shoots out)
               .smartCurrentLimit(40);
@@ -146,7 +156,7 @@ public final class Configs {
               .idleMode(IdleMode.kBrake)
               .smartCurrentLimit(30);
 
-      shooterConfig.encoder
+      globalShooterConfig.encoder
               .positionConversionFactor(shooterFactor)         // meters
               .velocityConversionFactor(shooterFactor / 60.0); // meters per second
 
@@ -154,7 +164,7 @@ public final class Configs {
               .positionConversionFactor(turretFactor)         // degrees
               .velocityConversionFactor(turretFactor / 60.0); // degrees per second
 
-      shooterConfig.closedLoop
+      globalShooterConfig.closedLoop
               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
               .pid(0.103, 0.0, 0.0)
               .outputRange(-1.0, 1.0);
@@ -164,12 +174,18 @@ public final class Configs {
               .pid(0.005, 0.0, 0.0)
               .outputRange(-1.0, 1.0);
 
-      shooterConfig.closedLoop.feedForward
+      globalShooterConfig.closedLoop.feedForward
               .kV(shootingVelocityFeedForward);
 
       turretConfig.softLimit
               .forwardSoftLimit(91)
               .reverseSoftLimit(-91);
+
+      leaderShooterConfig.apply(globalShooterConfig);
+
+      followerShooterConfig.apply(globalShooterConfig
+              .inverted(true)
+              .follow(ShooterConstants.leaderShooterCanId));
     }
   }
 

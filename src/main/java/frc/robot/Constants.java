@@ -123,6 +123,8 @@ public final class Constants {
             / kShootingMotorReduction;
 
     public static final double kShooterEfficiencyCoefficient = 1.0;
+    public static final int leaderShooterCanId = 19;
+    public static final int followerShooterCanId = 17;
 
   }
 
@@ -132,6 +134,7 @@ public final class Constants {
     public static final double kTurretMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60.;
     public static final double kTurretMotorReduction = (132/ 16.);
     public static final double kWheelFreeRps = kTurretMotorFreeSpeedRps / kTurretMotorReduction;
+    public static final int turretCanId = 18;
 
   }
 
@@ -139,6 +142,7 @@ public final class Constants {
     public static final double kPivotMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60.;
     public static final double kPivotMotorReduction = (100);
     public static final double kPivotArmLengthMeters = 0.3175;
+    public static final int pivotCanId = 14;
   }
 
   public static final class ClimberConstants {
@@ -146,5 +150,16 @@ public final class Constants {
     public static final double kClimberMotorReduction = (10);
     public static final double kClimberSpoolDiameterMeters = (0.02);
     public static final double kClimberSpoolCircumference = Math.PI * kClimberSpoolDiameterMeters;
+  }
+
+  public static final class IntakeConstants {
+    public static final int leaderRollerCanId = 13;
+    public static final int followRollerCanId = 15;
+  }
+
+  public static final class SpindexerConstants {
+    public static final int spindexerCanId = 20;
+    public static final int feederCanId = 21;
+
   }
 }

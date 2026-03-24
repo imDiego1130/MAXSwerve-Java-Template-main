@@ -7,26 +7,27 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
+import frc.robot.Constants;
 
 public class IntakeRollers extends SubsystemBase {
 
     // Motors
-    private final SparkMax groundRoller;
-    private final SparkMax topRoller;
+    private final SparkMax leaderForwardRoller;
+    private final SparkMax followerBackwardRoller;
     @SuppressWarnings("removal")
     public IntakeRollers() {
 
-        groundRoller = new SparkMax(13, MotorType.kBrushless);
-        topRoller    = new SparkMax(15, MotorType.kBrushless);
+        leaderForwardRoller = new SparkMax(Constants.IntakeConstants.leaderRollerCanId, MotorType.kBrushless);
+        followerBackwardRoller = new SparkMax(Constants.IntakeConstants.followRollerCanId, MotorType.kBrushless);
 
-        groundRoller.configure(
-            Configs.Intake.rollerConfig,
+        leaderForwardRoller.configure(
+            Configs.Intake.globalRollerConfig,
             SparkMax.ResetMode.kResetSafeParameters,
             SparkMax.PersistMode.kPersistParameters
         );
 
-        topRoller.configure(
-            Configs.Intake.rollerConfig,
+        followerBackwardRoller.configure(
+            Configs.Intake.globalRollerConfig,
             SparkMax.ResetMode.kResetSafeParameters,
             SparkMax.PersistMode.kPersistParameters
         );
@@ -41,23 +42,23 @@ public class IntakeRollers extends SubsystemBase {
     // =========================
 
     public void intakeIn() {
-        groundRoller.set(1);
-        topRoller.set(0);
+        leaderForwardRoller.set(1);
+        followerBackwardRoller.set(0);
     }
 
     public void intakeOut() {
-        groundRoller.set(-1);
-        topRoller.set(0);
+        leaderForwardRoller.set(-1);
+        followerBackwardRoller.set(0);
     }
 
     public void stop() {
-        groundRoller.set(0);
-        topRoller.set(0);
+        leaderForwardRoller.set(0);
+        followerBackwardRoller.set(0);
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Roller Velocity", groundRoller.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Roller Velocity", leaderForwardRoller.getEncoder().getVelocity());
     }
 
 }

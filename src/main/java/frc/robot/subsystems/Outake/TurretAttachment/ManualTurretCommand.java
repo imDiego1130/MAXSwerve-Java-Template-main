@@ -19,7 +19,8 @@ public class ManualTurretCommand extends Command {
     public void execute() {
 
         if (turret.isTrackingPosition) {
-
+            turret.setTargetPosition(driverControl.getVisionAngle());
+            return;
         }
 
         Rotation2d joystickAngle = driverControl.getJoyStickAngle();

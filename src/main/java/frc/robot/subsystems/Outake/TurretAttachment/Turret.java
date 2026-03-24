@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
+import frc.robot.Constants;
 
 import java.util.function.DoubleSupplier;
 
@@ -27,7 +28,7 @@ public class Turret extends SubsystemBase {
     @SuppressWarnings("removal")
     public Turret() {
 
-        turret = new SparkMax(18, MotorType.kBrushless);
+        turret = new SparkMax(Constants.TurretConstants.turretCanId, MotorType.kBrushless);
 
         turret.configure(
                 Configs.Outake.turretConfig,
@@ -38,14 +39,6 @@ public class Turret extends SubsystemBase {
         turretPID = turret.getClosedLoopController();
         turretEncoder = turret.getEncoder();
         turretEncoder.setPosition(-90);
-    }
-
-    public void setVisionAngleSupplier(DoubleSupplier visionAngleSupplier) {
-        this.visionAngleSupplier = visionAngleSupplier;
-    }
-
-    public double getVisionAngle(){
-        return visionAngleSupplier.getAsDouble();
     }
 
     public void setTargetPosition(double degrees) {

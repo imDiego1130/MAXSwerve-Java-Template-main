@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
+import frc.robot.Constants;
 
 public class Feeder extends SubsystemBase {
 
@@ -15,7 +16,7 @@ public class Feeder extends SubsystemBase {
     @SuppressWarnings("removal")
     public Feeder() {
 
-        feeder = new SparkMax(21, MotorType.kBrushless);
+        feeder = new SparkMax(Constants.SpindexerConstants.feederCanId, MotorType.kBrushless);
 
         feeder.configure(
                 Configs.Outake.feederConfig,

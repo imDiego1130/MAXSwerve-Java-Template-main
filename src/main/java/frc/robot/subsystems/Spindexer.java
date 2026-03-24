@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
+import frc.robot.Constants;
 
 public class Spindexer extends SubsystemBase {
 
@@ -15,7 +16,7 @@ public class Spindexer extends SubsystemBase {
     @SuppressWarnings("removal")
     public Spindexer() {
 
-        spindexer = new SparkMax(20, MotorType.kBrushless);
+        spindexer = new SparkMax(Constants.SpindexerConstants.spindexerCanId, MotorType.kBrushless);
 
         spindexer.configure(
             Configs.Spindexer.spindexerConfig,

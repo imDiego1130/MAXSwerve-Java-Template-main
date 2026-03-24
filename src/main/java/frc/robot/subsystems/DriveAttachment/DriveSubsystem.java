@@ -71,8 +71,8 @@ public class DriveSubsystem extends SubsystemBase {
             this::getChassisSpeeds,
             (speeds, feedforwards) -> drive(speeds),
             new PPHolonomicDriveController(
-                    new PIDConstants(2.0, 0.0, 0.0),
-                    new PIDConstants(2.0, 0.0, 0.0)
+                    new PIDConstants(5.0, 0.0, 0.0),
+                    new PIDConstants(5.0, 0.0, 0.0)
             ),
             config,
             () -> {
@@ -94,7 +94,7 @@ public class DriveSubsystem extends SubsystemBase {
             DriveConstants.kFrontLeftTurningCanId,
             DriveConstants.kFrontLeftTurningCanCoderId,
             DriveConstants.kFrontLeftChassisAngularOffset,
-            DriveConstants.kFrontLeftDrivingInvertDirection    );
+            DriveConstants.kFrontLeftDrivingInvertDirection);
 
     m_frontRight = new MAXSwerveModule(
             DriveConstants.kFrontRightDrivingCanId,

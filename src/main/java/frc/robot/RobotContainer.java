@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
@@ -15,10 +14,12 @@ import frc.robot.subsystems.DriveAttachment.DriveSubsystem;
 import frc.robot.subsystems.DriveAttachment.ManualDriveCommand;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Outake.Feeder;
+import frc.robot.subsystems.Outake.TurretAttachment.AutoTurretCommand;
 import frc.robot.subsystems.Outake.TurretAttachment.ManualTurretCommand;
 import frc.robot.subsystems.Outake.TurretAttachment.Turret;
- 
-import frc.robot.subsystems.Outake.Shooter;
+
+import frc.robot.subsystems.ShooterAttachment.ManualShooterCommand;
+import frc.robot.subsystems.ShooterAttachment.Shooter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -72,23 +73,11 @@ public class RobotContainer {
         m_turret = new Turret();
         m_shooter = new Shooter();
 
-        m_turret.setVisionAngleSupplier(() -> m_limelight.calculatedTargetAngleDegrees);
+        controlCenter.setVisionAngleSupplier(() -> m_limelight.calculatedTargetAngleDegrees);
+        controlCenter.setVisionDistanceSupplier(() -> m_limelight.distanceToTarget());
 
-        NamedCommands.registerCommand("turretToPosition", new RunCommand(() -> m_turret.setTargetPosition(m_limelight.calculatedTargetAngleDegrees), m_turret));
-        NamedCommands.registerCommand("shooterToVelocity", new RunCommand(() -> m_shooter.autoAdjustSpeed(m_limelight.distanceToTarget())));
-        NamedCommands.registerCommand("bootIntake", new InstantCommand(() -> {
-            m_intakePivot.lower();
-            m_intakeRollers.intakeIn();
-        }, m_intakePivot, m_intakeRollers));
-        NamedCommands.registerCommand("feed", new RunCommand(() -> {
-                        if (Math.abs(m_feeder.getRPM()) >= 1000) {
-                                m_spindexer.spinClockwise(m_operatorController.getLeftTriggerAxis() );
-                        }
-                        if (!m_shooter.isturnedOff && m_shooter.getVelocity() > 5) {
-                            m_feeder.feedIn();
-                        }
-
-                }, m_spindexer, m_feeder));
+        // command that never finishes, always tracks LL's target position
+        NamedCommands.registerCommand("turretToPosition", new AutoTurretCommand(m_turret, controlCenter));
 
         // Configure the button bindings
         configureButtonBindings();
@@ -105,25 +94,7 @@ public class RobotContainer {
 
          
         m_shooter.setDefaultCommand(
-                new RunCommand(() -> {
-                    double y = 0.5*MathUtil.applyDeadband(-m_operatorController.getRightY(), 0.1);
-                    if (!m_shooter.isturnedOff) {
-                        if (!m_shooter.isAutoAdjusting) {
-                            double setVelocity = m_shooter.getTargetVelocity() + y;
-
-                            if (setVelocity > 0) {
-                                m_shooter.spinWithVelocity(setVelocity);
-                            } else {
-                                m_shooter.spinWithVelocity(0);
-                            }
-                        } else {
-                            m_shooter.autoAdjustSpeed(m_limelight.distanceToTarget());
-                        }
-                    } else {
-                        m_shooter.spinWithVelocity(0);
-                    }
-                        
-                }, m_shooter)
+                new ManualShooterCommand(m_shooter, controlCenter)
         );
     }
 
@@ -230,7 +201,7 @@ public class RobotContainer {
         // Shooter power toggle
         Trigger buttonY = new Trigger(() -> m_operatorController.getYButtonPressed());
         buttonY.onTrue(
-                new InstantCommand(() -> m_shooter.isturnedOff = true, m_shooter)
+                new InstantCommand(() -> m_shooter.isturnedOff = !m_shooter.isturnedOff, m_shooter)
         );
 
         Trigger leftBumper2 = new Trigger(() -> m_operatorController.getLeftBumperButtonPressed());
@@ -251,12 +222,6 @@ public class RobotContainer {
                         m_shooter.targetVelocity = 8.5;
                     }
                 }, m_shooter)
-        );
-
-        // Shooter-Speed Control Toggle
-        Trigger buttonA = new Trigger(() -> m_operatorController.getAButtonPressed());
-        buttonA.onTrue(
-                new InstantCommand(() -> m_shooter.isturnedOff = false, m_shooter)
         );
 
         // Anti-Jam reverse trigger
@@ -320,13 +285,4 @@ public class RobotContainer {
         return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
         */
     }
-
-    public IntakeRollers getIntake() {
-        return m_intakeRollers;
-    }
-
-    public Spindexer getSpindexer() {
-        return m_spindexer;
-    }
-
 }
