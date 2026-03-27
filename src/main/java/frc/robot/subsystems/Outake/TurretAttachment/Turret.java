@@ -10,8 +10,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
 
-import java.util.function.DoubleSupplier;
-
 public class Turret extends SubsystemBase {
 
     // Motors
@@ -24,7 +22,6 @@ public class Turret extends SubsystemBase {
     private final double MAX_ANGLE = 90;
     public boolean isTrackingPosition = false;
     private double target = -90;
-    private DoubleSupplier visionAngleSupplier;
     @SuppressWarnings("removal")
     public Turret() {
 
@@ -37,6 +34,7 @@ public class Turret extends SubsystemBase {
         );
 
         turretPID = turret.getClosedLoopController();
+        turretPID.setIAccum(0);
         turretEncoder = turret.getEncoder();
         turretEncoder.setPosition(-90);
     }

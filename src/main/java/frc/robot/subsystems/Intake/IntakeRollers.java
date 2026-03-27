@@ -21,13 +21,13 @@ public class IntakeRollers extends SubsystemBase {
         followerBackwardRoller = new SparkMax(Constants.IntakeConstants.followRollerCanId, MotorType.kBrushless);
 
         leaderForwardRoller.configure(
-            Configs.Intake.globalRollerConfig,
+            Configs.Intake.leaderRollerConfig,
             SparkMax.ResetMode.kResetSafeParameters,
             SparkMax.PersistMode.kPersistParameters
         );
 
         followerBackwardRoller.configure(
-            Configs.Intake.globalRollerConfig,
+            Configs.Intake.followerRollerConfig,
             SparkMax.ResetMode.kResetSafeParameters,
             SparkMax.PersistMode.kPersistParameters
         );
@@ -43,7 +43,7 @@ public class IntakeRollers extends SubsystemBase {
 
     public void intakeIn() {
         leaderForwardRoller.set(1);
-        followerBackwardRoller.set(0);
+        followerBackwardRoller.set(1);
     }
 
     public void intakeOut() {

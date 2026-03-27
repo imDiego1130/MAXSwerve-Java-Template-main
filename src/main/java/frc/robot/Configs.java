@@ -95,6 +95,7 @@ public final class Configs {
 
         // Pivot (closed loop position)
         pivotConfig
+        .inverted(true)
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(30);
 
@@ -111,7 +112,8 @@ public final class Configs {
 
         followerRollerConfig.apply(globalRollerConfig
                 .inverted(true)
-                .follow(Constants.IntakeConstants.leaderRollerCanId));
+                //.follow(Constants.IntakeConstants.leaderRollerCanId));
+        );
     }
   }
   public static final class Spindexer {
@@ -137,13 +139,11 @@ public final class Configs {
       double shooterFactor = ShooterConstants.kWheelCircumferenceMeters / ShooterConstants.kShootingMotorReduction;
       double turretFactor = (1 / TurretConstants.kTurretMotorReduction) * 360;
 
-      double nominalVoltage = 12.0;
-
-      double shootingVelocityFeedForward =  nominalVoltage / ShooterConstants.kWheelFreeVelocityMps;
+      double shootingVelocityFeedForward =  0.035;//(0.035/2)*1.8
 
       globalShooterConfig
               .idleMode(IdleMode.kCoast)
-              .inverted(false) // shooter is geared, invert direction (+ direction shoots out)
+              .inverted(true) // shooter is chained, invert direction from previous setting(+ direction shoots out)
               .smartCurrentLimit(40);
 
       turretConfig
@@ -153,6 +153,7 @@ public final class Configs {
 
       
       feederConfig
+           .inverted(true)
               .idleMode(IdleMode.kBrake)
               .smartCurrentLimit(30);
 
@@ -166,12 +167,12 @@ public final class Configs {
 
       globalShooterConfig.closedLoop
               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-              .pid(0.103, 0.0, 0.0)
+              .pid(0.05, 0.0, 0.0)
               .outputRange(-1.0, 1.0);
 
       turretConfig.closedLoop
               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-              .pid(0.005, 0.0, 0.0)
+              .pid(0.008, 0.0, 0.325)
               .outputRange(-1.0, 1.0);
 
       globalShooterConfig.closedLoop.feedForward
@@ -184,8 +185,7 @@ public final class Configs {
       leaderShooterConfig.apply(globalShooterConfig);
 
       followerShooterConfig.apply(globalShooterConfig
-              .inverted(true)
-              .follow(ShooterConstants.leaderShooterCanId));
+              .follow(ShooterConstants.leaderShooterCanId, true));
     }
   }
 

@@ -23,7 +23,8 @@ public class IntakePivot extends SubsystemBase {
     // Preset Positions
     // in deg
     private static final double UP_POSITION = 25;
-    private static final double DOWN_POSITION = 102;
+    private static final double DOWN_POSITION = 78;
+    private double targetPosition = 0;
 
     @SuppressWarnings("removal")
     public IntakePivot() {
@@ -38,10 +39,6 @@ public class IntakePivot extends SubsystemBase {
         pivotPID = pivotMotor.getClosedLoopController();
         pivotEncoder = pivotMotor.getEncoder();
         pivotEncoder.setPosition(0);
-
-        setDefaultCommand(
-                new RunCommand(() -> stop(), this)
-        );
     }
 
     // =========================
@@ -49,11 +46,11 @@ public class IntakePivot extends SubsystemBase {
     // =========================
 
     public void raise() {
-        pivotPID.setSetpoint(UP_POSITION, SparkMax.ControlType.kPosition);
+        targetPosition = UP_POSITION;
     }
 
     public void lower() {
-        pivotPID.setSetpoint(DOWN_POSITION, SparkMax.ControlType.kPosition);
+        targetPosition = DOWN_POSITION;
     }
 
     public double getPivotPosition() {
@@ -61,11 +58,12 @@ public class IntakePivot extends SubsystemBase {
     }
 
     public void stop() {
-        pivotMotor.stopMotor();
+        pivotMotor.setVoltage(0);
     }
 
     @Override
     public void periodic() {
+        pivotPID.setSetpoint(targetPosition, SparkMax.ControlType.kPosition);
         SmartDashboard.putNumber("Pivot Deg: ", getPivotPosition());
     }
 

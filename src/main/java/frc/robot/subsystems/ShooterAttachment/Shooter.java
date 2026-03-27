@@ -49,7 +49,6 @@ public class Shooter extends SubsystemBase {
 
     public void setTargetVelocity(double velocity) {
         velocity = Math.max(velocity, 0);
-        targetVelocity = Math.min(velocity, 9);
     }
 
     public void stop() {

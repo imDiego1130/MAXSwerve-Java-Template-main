@@ -15,8 +15,8 @@ public class DriveControl {
     private DoubleSupplier visionDistanceSupplier;
     private final ArrayList<double[]> dataPoints = new ArrayList<>(Arrays.asList(
             // 0 : distance (meters), 1 : velocity (m/s), 2 : angle (deg)
-            new double[]{3.2 , 8.0, 0.0 }
-            ,new double[]{4.36, 9.0, 0.0 }
+            new double[]{3.05 , 19, 0.0 }
+            ,new double[]{4.36, 22, 0.0 }
             //,new double[]{5.5 , 25.7, 0.0 }
     ));
 
@@ -80,7 +80,7 @@ public class DriveControl {
     }
 
     public Rotation2d getJoyStickAngle(){
-        double x = MathUtil.applyDeadband(operator.getRightX(), 0.1);
+        double x = -MathUtil.applyDeadband(operator.getRightX(), 0.1);
         double y = -MathUtil.applyDeadband(operator.getRightY(), 0.1);
 
         if (Math.hypot(x, y) < 0.15){

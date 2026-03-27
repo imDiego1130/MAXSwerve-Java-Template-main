@@ -105,10 +105,9 @@ public class RobotContainer {
 
     public void configureByColor(String team){
         if (team == "red"){
-            // idk get the red goal pose
-            m_limelight.setTargetPose(new Pose2d((4.625594+3.6449) - 0.4,(4.034536 +0.381), new Rotation2d()));
+            m_limelight.setTargetPose(new Pose2d((4.611624+7.2898),(4.021328), new Rotation2d()));
         } else  if (team == "blue"){
-            m_limelight.setTargetPose(new Pose2d((4.625594) + 0.4,(4.034536 +0.381), new Rotation2d()));
+            m_limelight.setTargetPose(new Pose2d((4.611624),(4.021328), new Rotation2d()));
         }
     }
 
@@ -152,7 +151,7 @@ public class RobotContainer {
         
 
         // Bumpers
-        /* 
+         
         Trigger leftBumper = new Trigger(() -> m_driverController.getLeftBumperButton());
         leftBumper.onTrue(
                 new InstantCommand(() -> m_intakePivot.raise(), m_intakePivot)
@@ -161,16 +160,16 @@ public class RobotContainer {
         rightBumper.onTrue(
                 new InstantCommand(() -> m_intakePivot.lower(), m_intakePivot)
         );
-        */
+        
 
         // OPERATOR CONTROLLER ---
 
         // Spindexer
-        Trigger leftTrigger2 = new Trigger(() -> m_operatorController.getLeftTriggerAxis() > 0.1);
-        leftTrigger2.whileTrue(
+        Trigger rightTrigger2 = new Trigger(() -> m_operatorController.getRightTriggerAxis() > 0.1);
+        rightTrigger2.whileTrue(
                 new RunCommand(() -> {
                         if (Math.abs(m_feeder.getRPM()) >= 1000) {
-                                m_spindexer.spinClockwise(m_operatorController.getLeftTriggerAxis() );
+                                m_spindexer.spinClockwise(m_operatorController.getRightTriggerAxis() );
                         }
                         if (!m_shooter.isturnedOff && m_shooter.getVelocity() > 5) {
                             m_feeder.feedIn();
@@ -209,7 +208,7 @@ public class RobotContainer {
             new RunCommand(
                 () -> {
                     if (!m_shooter.isturnedOff) {
-                        m_shooter.targetVelocity = 7.7;
+                        m_shooter.targetVelocity = 19.4;//19
                     }
                 }, m_shooter)
         );
@@ -219,17 +218,17 @@ public class RobotContainer {
             new RunCommand(
                 () -> {
                     if (!m_shooter.isturnedOff) {
-                        m_shooter.targetVelocity = 8.5;
+                        m_shooter.targetVelocity = 22.5;//
                     }
                 }, m_shooter)
         );
 
         // Anti-Jam reverse trigger
-        Trigger rightTrigger2 = new Trigger(()  -> m_operatorController.getRightTriggerAxis() > 0.2);
-        rightTrigger2.whileTrue(
+        Trigger leftTrigger2 = new Trigger(()  -> m_operatorController.getLeftTriggerAxis() > 0.2);
+        leftTrigger2.whileTrue(
                 new RunCommand(() -> {
                     if (Math.abs(m_feeder.getRPM()) >= 1000) {
-                        m_spindexer.spinCounterClockwise(m_operatorController.getRightTriggerAxis() );
+                        m_spindexer.spinCounterClockwise(m_operatorController.getLeftTriggerAxis() );
                     }
                 }, m_spindexer, m_feeder)
         );

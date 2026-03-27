@@ -118,7 +118,7 @@ public final class Constants {
     public static final double kWheelCircumferenceMeters =  kWheelDiameterMeters * Math.PI;
 
     public static final double kShootingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60.;
-    public static final double kShootingMotorReduction = (48 / 84.);
+    public static final double kShootingMotorReduction = (1);
     public static final double kWheelFreeVelocityMps = (kShootingMotorFreeSpeedRps *  kWheelCircumferenceMeters)
             / kShootingMotorReduction;
 
@@ -140,7 +140,7 @@ public final class Constants {
 
   public static final class PivotConstants {
     public static final double kPivotMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60.;
-    public static final double kPivotMotorReduction = (100);
+    public static final double kPivotMotorReduction = (70 * 4);
     public static final double kPivotArmLengthMeters = 0.3175;
     public static final int pivotCanId = 14;
   }
