@@ -48,7 +48,7 @@ public class IntakeRollers extends SubsystemBase {
 
     public void intakeOut() {
         leaderForwardRoller.set(-1);
-        followerBackwardRoller.set(0);
+        followerBackwardRoller.set(-1);
     }
 
     public void stop() {

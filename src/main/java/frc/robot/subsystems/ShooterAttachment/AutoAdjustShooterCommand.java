@@ -3,11 +3,11 @@ package frc.robot.subsystems.ShooterAttachment;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.DriveControl;
 
-public class ManualShooterCommand extends Command {
+public class AutoAdjustShooterCommand extends Command {
     private final Shooter shooter;
     private final DriveControl driverControl;
 
-    public  ManualShooterCommand(Shooter shooter, DriveControl driverControl) {
+    public  AutoAdjustShooterCommand(Shooter shooter, DriveControl driverControl) {
         this.shooter = shooter;
         this.driverControl = driverControl;
 
@@ -16,15 +16,7 @@ public class ManualShooterCommand extends Command {
 
     @Override
     public void execute() {
-        if (shooter.isturnedOff) {
-            shooter.setTargetVelocity(0);
-            return;
-        }
-
-        if (shooter.isAutoAdjusting) {
-            shooter.setTargetVelocity(driverControl.getCorrelatedVelocity());
-            return;
-        }
+        shooter.setTargetVelocity(driverControl.getCorrelatedVelocity());
     }
 
     @Override

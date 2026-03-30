@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -13,11 +11,12 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveAttachment.DriveSubsystem;
 import frc.robot.subsystems.DriveAttachment.ManualDriveCommand;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.LimelightAutoTargetCommand;
 import frc.robot.subsystems.Outake.Feeder;
 import frc.robot.subsystems.Outake.TurretAttachment.AutoTurretCommand;
 import frc.robot.subsystems.Outake.TurretAttachment.ManualTurretCommand;
 import frc.robot.subsystems.Outake.TurretAttachment.Turret;
-
+import frc.robot.subsystems.ShooterAttachment.AutoSetShooterCommand;
 import frc.robot.subsystems.ShooterAttachment.ManualShooterCommand;
 import frc.robot.subsystems.ShooterAttachment.Shooter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -65,19 +64,24 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        m_robotDrive = new DriveSubsystem();
         m_intakeRollers = new IntakeRollers();
         m_intakePivot = new IntakePivot();
         m_spindexer = new Spindexer();
         m_feeder = new Feeder();
         m_turret = new Turret();
         m_shooter = new Shooter();
+        m_robotDrive = new DriveSubsystem();
 
         controlCenter.setVisionAngleSupplier(() -> m_limelight.calculatedTargetAngleDegrees);
         controlCenter.setVisionDistanceSupplier(() -> m_limelight.distanceToTarget());
 
         // command that never finishes, always tracks LL's target position
         NamedCommands.registerCommand("turretToPosition", new AutoTurretCommand(m_turret, controlCenter));
+        NamedCommands.registerCommand("setShooterSpeed", new AutoSetShooterCommand(m_shooter, controlCenter));
+        NamedCommands.registerCommand("feedIn", new RunCommand(() -> m_feeder.feedIn(), m_feeder));
+        NamedCommands.registerCommand("spindexerIn", new RunCommand(() -> m_spindexer.spinClockwise(1), m_spindexer));
+        NamedCommands.registerCommand("intakeDown", new InstantCommand(() -> m_intakePivot.lower(), m_intakePivot));
+
 
         // Configure the button bindings
         configureButtonBindings();
@@ -96,6 +100,8 @@ public class RobotContainer {
         m_shooter.setDefaultCommand(
                 new ManualShooterCommand(m_shooter, controlCenter)
         );
+
+        SmartDashboard.putBoolean("isTargetingGoal:", controlCenter.isTargetingGoal);
     }
 
      public void setUpAutoChooser(){
@@ -104,15 +110,15 @@ public class RobotContainer {
     }
 
     public void configureByColor(String team){
-        if (team == "red"){
-            m_limelight.setTargetPose(new Pose2d((4.611624+7.2898),(4.021328), new Rotation2d()));
-        } else  if (team == "blue"){
-            m_limelight.setTargetPose(new Pose2d((4.611624),(4.021328), new Rotation2d()));
-        }
+        controlCenter.setTeamColor(team);
     }
 
     public void initLimelight(){
         m_limelight = new Limelight(m_robotDrive.m_odometry, m_turret, m_robotDrive.m_gyro, true);
+
+        m_limelight.setDefaultCommand(
+                new LimelightAutoTargetCommand(m_limelight, controlCenter)
+        );
     }
 
     /**
@@ -208,7 +214,7 @@ public class RobotContainer {
             new RunCommand(
                 () -> {
                     if (!m_shooter.isturnedOff) {
-                        m_shooter.targetVelocity = 19.4;//19
+                        m_shooter.targetVelocity = 16.5;//19
                     }
                 }, m_shooter)
         );
@@ -218,7 +224,7 @@ public class RobotContainer {
             new RunCommand(
                 () -> {
                     if (!m_shooter.isturnedOff) {
-                        m_shooter.targetVelocity = 22.5;//
+                        m_shooter.targetVelocity = 18.75;//
                     }
                 }, m_shooter)
         );
@@ -230,7 +236,13 @@ public class RobotContainer {
                     if (Math.abs(m_feeder.getRPM()) >= 1000) {
                         m_spindexer.spinCounterClockwise(m_operatorController.getLeftTriggerAxis() );
                     }
+                    m_feeder.feedOut();
                 }, m_spindexer, m_feeder)
+        );
+
+        Trigger buttonA = new Trigger(() -> m_operatorController.getAButtonPressed());
+        buttonA.onTrue(
+            new InstantCommand(() -> controlCenter.isTargetingGoal = !controlCenter.isTargetingGoal)
         );
         
     }
@@ -240,9 +252,9 @@ public class RobotContainer {
      *
      * @return the command to run in autonomous
      */
-    public Command getAutonomousCommand() {
+    public String getAutonomousCommand() {
 
-        return autoChooser.getSelected();
+        return autoChooser.getSelected().getName();
         /* 
         // Create config for trajectory
         TrajectoryConfig config = new TrajectoryConfig(

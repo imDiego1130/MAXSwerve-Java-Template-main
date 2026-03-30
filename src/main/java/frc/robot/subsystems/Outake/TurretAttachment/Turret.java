@@ -17,8 +17,9 @@ public class Turret extends SubsystemBase {
     private final RelativeEncoder turretEncoder;
     private final SparkClosedLoopController turretPID;
     // IN DEGREES
-    // + in position is cw rotation
-    private final double MIN_ANGLE = -90;
+    // + in position is cw rotation\
+
+    private final double MIN_ANGLE = -110;
     private final double MAX_ANGLE = 90;
     public boolean isTrackingPosition = false;
     private double target = -90;

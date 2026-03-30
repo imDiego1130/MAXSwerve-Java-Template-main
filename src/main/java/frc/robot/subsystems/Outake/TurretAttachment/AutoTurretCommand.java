@@ -16,7 +16,7 @@ public class AutoTurretCommand extends Command {
 
     @Override
     public void execute() {
-        turret.setTargetPosition(driverControl.getVisionAngle());
+        turret.setTargetPosition(-90);
     }
 
     @Override

@@ -106,7 +106,7 @@ public final class Configs {
         pivotConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(0.1, 0.0, 0.0)
-            .outputRange(-0.8, 0.8);
+            .outputRange(-0.9, 0.9);
 
         leaderRollerConfig.apply(globalRollerConfig);
 

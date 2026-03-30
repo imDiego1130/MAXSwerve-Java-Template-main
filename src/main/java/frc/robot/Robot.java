@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -30,12 +32,11 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    m_robotContainer.m_robotDrive.initialize();
     m_robotContainer.initLimelight();
 
     m_robotContainer.setUpAutoChooser();
 
-    //CameraServer.startAutomaticCapture();
+    CameraServer.startAutomaticCapture();
     //LimelightHelpers.setupPortForwardingUSB(0);
   }
 
@@ -73,7 +74,9 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    //m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    String auto = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = AutoBuilder.buildAuto(auto);
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",

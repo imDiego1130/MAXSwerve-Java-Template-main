@@ -64,10 +64,12 @@ public class DriveSubsystem extends SubsystemBase {
                           ModuleConstants.kWheelDiameterMeters, ModuleConstants.kDriveWheelFreeVelocityMps, 1.0, DCMotor.getNEO(1), 50.0, 1),
                   DriveConstants.kTrackWidth);
     }
+
+    initialize();
             
     AutoBuilder.configure(
             this::getPose,
-            this::resetPose,
+            this::resetOdometry,
             this::getChassisSpeeds,
             (speeds, feedforwards) -> drive(speeds),
             new PPHolonomicDriveController(

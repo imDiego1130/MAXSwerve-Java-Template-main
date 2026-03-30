@@ -149,6 +149,11 @@ public class Limelight extends SubsystemBase {
         targetPose = pose;
     }
 
+    public Pose2d getCurrentPose(){
+        latestPose = m_poseEstimator.getEstimatedPosition();
+        return latestPose;
+    }
+
 
     @Override
     public void periodic() {
